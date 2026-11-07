@@ -118,6 +118,9 @@ function handle(store: MockStore, req: Parameters<HttpInterceptorFn>[0], userId:
   if (segments[0] === 'movies' && segments[2] === 'showtimes' && method === 'GET') {
     return store.getShowtimes(Number(segments[1]), query);
   }
+  if (segments[0] === 'theatres' && segments[2] === 'showtimes' && method === 'GET') {
+    return store.getTheatreShows(Number(segments[1]));
+  }
   if (segments[0] === 'showtimes' && segments[2] === 'seats' && method === 'GET') {
     return store.getSeats(Number(segments[1]));
   }

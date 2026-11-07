@@ -1,6 +1,5 @@
 <div class="container page search-page">
   <header class="search-head">
-    <p class="eyebrow">{{ location.city() }}</p>
     <h1>Find a film or a theatre</h1>
   </header>
 
@@ -45,9 +44,6 @@
   } @else {
     @if (searching()) {
     <div class="results-bar">
-      <p class="results-summary">
-        <strong>{{ total() }}</strong> {{ total() === 1 ? 'result' : 'results' }} for “{{ term() }}”
-      </p>
       @if (searching() && movies().length > 0 && theaters().length > 0) {
         <div class="scope" role="tablist" aria-label="Show results">
           <button type="button" role="tab" class="scope-tab" [attr.aria-selected]="scope() === 'all'" [class.on]="scope() === 'all'" (click)="scope.set('all')">
@@ -98,24 +94,9 @@
         </div>
         <div class="theatre-grid">
           @for (theater of theaters(); track theater.id) {
-            <article class="theatre-card">
-              <div class="theatre-top">
-                <h3>{{ theater.name }}</h3>
-                <p class="theatre-address selectable">{{ theater.address }}</p>
-              </div>
-              @if (theater.movies.length > 0) {
-                <div class="theatre-films">
-                  @for (movie of theater.movies.slice(0, 4); track movie.id) {
-                    <a class="film-chip" [routerLink]="['/movies', movie.id]">{{ movie.title }}</a>
-                  }
-                  @if (theater.movies.length > 4) {
-                    <span class="film-more">+{{ theater.movies.length - 4 }} more</span>
-                  }
-                </div>
-              } @else {
-                <p class="theatre-empty">No shows listed right now.</p>
-              }
-            </article>
+            <a class="theatre-card" [routerLink]="['/theatres', theater.id]">
+              <h3>{{ theater.name }}</h3>
+            </a>
           }
         </div>
       </section>

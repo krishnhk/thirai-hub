@@ -1,0 +1,167 @@
+:host {
+  display: block;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.back {
+  align-self: flex-start;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.head h1 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.addr {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* One card per film; under the film, its shows for each language */
+.film {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.film-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.film-title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.language {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.language-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Showtime tickets, the same as on the movie page */
+.chip-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 110px);
+  justify-content: space-evenly;
+  gap: 10px;
+}
+
+/* Ticket-shaped showtime: fixed size, cut corners, dashed tear line under the time. */
+.showtime-chip {
+  position: relative;
+  isolation: isolate;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 3px;
+  width: 110px;
+  height: 53px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 0;
+  font-size: 0.85rem;
+  text-align: center;
+  line-height: 1.2;
+  --edge: var(--border);
+  background: var(--edge);
+  clip-path: path('M8 0H102A8 8 0 0 0 110 8V45A8 8 0 0 0 102 53H8A8 8 0 0 0 0 45V8A8 8 0 0 0 8 0Z');
+  display: flex;
+  cursor: pointer;
+  color: var(--text);
+  font-family: inherit;
+}
+
+.showtime-chip::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: var(--surface-2);
+  transition: background 140ms ease;
+  clip-path: path('M7 0H101A7 7 0 0 0 108 7V44A7 7 0 0 0 101 51H7A7 7 0 0 0 0 44V7A7 7 0 0 0 7 0Z');
+}
+
+.showtime-chip:hover,
+.showtime-chip:focus-visible {
+  --edge: var(--accent);
+}
+
+.showtime-chip:hover::before {
+  background: var(--surface-3);
+}
+
+.showtime-chip:focus-visible {
+  outline: none;
+}
+
+.showtime-chip:focus-visible::before {
+  inset: 2px;
+  clip-path: path('M6 0H100A6 6 0 0 0 106 6V43A6 6 0 0 0 100 49H6A6 6 0 0 0 0 43V6A6 6 0 0 0 6 0Z');
+}
+
+.showtime-chip .fmt {
+  padding-top: 5px;
+  border-top: 1px dashed var(--border);
+}
+
+.showtime-chip .time {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.none {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 375px) {
+  .showtime-chip {
+    padding: 8px 10px;
+  }
+}
+
+/* Phones have the navigation bar, so the back link is not needed */
+@media (max-width: 560px) {
+  .back {
+    display: none;
+  }
+}

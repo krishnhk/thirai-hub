@@ -97,6 +97,13 @@ export interface ShowtimeListResponse {
   dates: string[];
 }
 
+/** Every upcoming show at one theatre, with the days that have any. */
+export interface TheatreShowsResponse {
+  theater: Theater;
+  showtimes: ShowtimeWithRefs[];
+  dates: string[];
+}
+
 export interface TheaterWithMovies extends Theater {
   movies: { id: number; title: string }[];
 }

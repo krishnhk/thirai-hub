@@ -34,6 +34,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/search/search').then((m) => m.SearchComponent),
   },
   {
+    path: 'theatres/:theatreId',
+    title: 'Theatre shows',
+    loadComponent: () => import('./pages/theatres/theatre-shows').then((m) => m.TheatreShowsComponent),
+  },
+  {
     path: 'movies/:movieId',
     title: 'Movie details',
     loadComponent: () => import('./pages/movies/movie-detail').then((m) => m.MovieDetailComponent),

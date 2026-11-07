@@ -1,0 +1,48 @@
+<div class="container page">
+  <a class="back" routerLink="/search">← Search</a>
+
+  @if (loading()) {
+    <app-loading-spinner label="Loading theatre…" />
+  } @else if (error(); as message) {
+    <div class="alert alert-error">{{ message }}</div>
+  } @else if (theater(); as t) {
+    <header class="head">
+      <app-theatre-logo style="--logo-size: 64px" [name]="t.name" [id]="t.id" [logoUrl]="t.logoUrl" />
+      <div>
+        <h1>{{ t.name }}</h1>
+        <p class="addr selectable">{{ t.address }}</p>
+      </div>
+    </header>
+
+    @if (dates().length === 0) {
+      <app-empty-state icon="🎟️" title="No shows here" message="This theatre has no upcoming shows right now." />
+    } @else {
+      <app-day-strip label="Show day" [days]="stripDays()" [selected]="selectedDate()" (picked)="selectDate($event)" />
+
+      @for (film of filmsOnDay(); track film.movie.id) {
+        <section class="film">
+          <header class="film-head">
+            <h2 class="film-title">{{ film.movie.title }}</h2>
+            <span class="meta">{{ film.movie.durationMinutes }} min · {{ film.movie.certificate }}</span>
+          </header>
+
+          @for (language of film.languages; track language.language) {
+            <div class="language">
+              <span class="language-label">{{ language.language }}</span>
+              <div class="chip-row">
+                @for (showtime of language.showtimes; track showtime.id) {
+                  <button type="button" class="showtime-chip" (click)="goToSeats(showtime)">
+                    <span class="time">{{ showtime.showDateTime | showTime }}</span>
+                    <span class="fmt text-xs text-muted">{{ showtime.format }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </section>
+      } @empty {
+        <p class="none">No shows on this day. Pick another day above.</p>
+      }
+    }
+  }
+</div>

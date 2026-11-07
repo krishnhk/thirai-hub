@@ -302,6 +302,37 @@
   color: var(--text-muted);
 }
 
+/* A theatre card is just its name, and the card opens the theatre's shows */
+.theatre-card {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.theatre-card h3 {
+  margin: 0;
+}
+
+.theatre-card:hover h3 {
+  color: var(--brand);
+}
+
+/* The theatre name and address open its shows */
+.theatre-top {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.theatre-top:hover h3 {
+  color: var(--brand);
+}
+
+.theatre-top:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .theatre-empty {
   margin: 0;
   font-size: 0.84rem;

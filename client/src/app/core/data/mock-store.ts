@@ -46,6 +46,7 @@ import {
   Showtime,
   SearchResponse,
   ShowtimeListResponse,
+  TheatreShowsResponse,
   languagesOf,
   ShowtimeWithRefs,
   Theater,
@@ -532,6 +533,20 @@ export class MockStore {
       });
 
     return clone({ movies, theaters: matchedTheaters });
+  }
+
+  /** Every upcoming show at one theatre, across all films, and the days they fall on. */
+  getTheatreShows(theaterId: number): TheatreShowsResponse {
+    const theater = this.theaters.find((candidate) => candidate.id === theaterId);
+    if (!theater) {
+      throw new MockApiError('That theatre could not be found.', 404);
+    }
+    const showtimes = this.browsableShowtimes()
+      .filter((showtime) => showtime.theaterId === theaterId)
+      .map((showtime) => this.withRefs(showtime))
+      .filter((showtime): showtime is ShowtimeWithRefs => showtime !== null);
+    const dates = [...new Set(showtimes.map((showtime) => dateKey(showtime.showDateTime)))].sort();
+    return clone({ theater, showtimes, dates });
   }
 
   getShowtimes(movieId: number, query: Record<string, string>): ShowtimeListResponse {

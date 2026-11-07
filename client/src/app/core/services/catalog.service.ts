@@ -7,6 +7,7 @@ import {
   SearchResponse,
   SeatMapResponse,
   ShowtimeListResponse,
+  TheatreShowsResponse,
   ShowtimeWithRefs,
 } from '../models/catalog.model';
 import { API_BASE } from './auth.service';
@@ -48,6 +49,10 @@ export class CatalogService {
     return this.http.get<ShowtimeListResponse>(`${API_BASE}/movies/${movieId}/showtimes`, {
       params: this.toParams(query),
     });
+  }
+
+  getTheatreShows(theaterId: number): Observable<TheatreShowsResponse> {
+    return this.http.get<TheatreShowsResponse>(`${API_BASE}/theatres/${theaterId}/showtimes`);
   }
 
   getSeats(showtimeId: number): Observable<SeatMapResponse> {
