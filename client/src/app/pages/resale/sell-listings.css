@@ -209,7 +209,7 @@
 
   .l-label { font-size: 0.62rem; }
   .l-price strong { font-size: 1rem; }
-  .l-sub { font-size: 0.64rem; }
+  .l-sub { display: none; }
   .l-price { gap: 0; line-height: 1.15; }
 
   .l-action .btn { display: block; width: 100%; padding: 3px 10px; font-size: 0.74rem; text-align: center; }
