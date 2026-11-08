@@ -106,24 +106,18 @@ interface StripDay {
 
       @if (visibleShows().length) {
         <div class="table-wrap">
-          <table class="data-table">
+          <table class="data-table" [class.by-screen]="view() === 'screen'">
             <caption class="sr-only">Shows on {{ dayLabel() }}</caption>
-            <colgroup>
-              <col class="w-check" /><col class="w-time" /><col class="w-poster" /><col class="w-film" />
-              @if (view() === 'time') {
-                <col class="w-screen" />
-              }
-              <col class="w-prices" /><col />
-            </colgroup>
             <thead>
               <tr>
                 <th class="c-check"><span class="sr-only">Select</span></th>
-                <th scope="col">Time</th>
-                <th scope="col" colspan="2">Film</th>
+                <th scope="col" class="c-time">Time</th>
+                <th scope="col" class="c-poster">Film</th>
+                <th class="c-film"><span class="sr-only">Title</span></th>
                 @if (view() === 'time') {
-                  <th scope="col">Screen</th>
+                  <th scope="col" class="c-where">Screen</th>
                 }
-                <th scope="col">Prices</th>
+                <th scope="col" class="c-prices">Prices</th>
                 <th scope="col" class="c-status">Status</th>
               </tr>
             </thead>
@@ -407,11 +401,12 @@ interface StripDay {
     .summary dt { font-size: 0.8rem; color: var(--text-muted); }
     .summary dd { margin: 0; font-size: 0.95rem; font-weight: 700; }
     .group-empty td { padding: 16px !important; color: var(--text-muted); font-size: 0.85rem; }
-    .data-table { min-width: 860px; table-layout: fixed; }
-    .w-check { width: 48px; } .w-time { width: 120px; } .w-poster { width: 64px; } .w-screen { width: 160px; } .w-prices { width: 220px; } .w-film { width: 300px; }
+    .data-table td { white-space: nowrap; }
+    .data-table th.c-time { width: 13%; } .data-table th.c-film { width: 32%; } .data-table th.c-where { width: 15%; } .data-table th.c-prices { width: 20%; }
+    .data-table.by-screen th.c-film { width: 42%; } .data-table th.c-poster { width: 64px; }
     .c-time { white-space: nowrap; }
     .c-poster { padding-right: 0 !important; }
-    .c-film strong, .c-film small, .c-where strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .c-film strong, .c-film small { display: block; max-width: min(300px, 22vw); overflow: hidden; text-overflow: ellipsis; }
     .c-where strong { display: block; font-size: 0.9rem; font-weight: 600; }
     .c-where small { display: block; margin-top: 2px; font-size: 0.78rem; color: var(--text-muted); }
     .c-film .fmt { margin-left: 4px; padding: 0 6px; font-size: 0.68rem; vertical-align: 1px; }
@@ -463,7 +458,7 @@ interface StripDay {
     .search-icon { position: absolute; left: 11px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; pointer-events: none; }
     @keyframes slide-in { from { transform: translateX(16px); opacity: 0; } }
     /* Phones: each show is a card with its poster on the left */
-    @media (max-width: 760px) {
+    @media (max-width: 1100px) {
       .data-table, .data-table tbody { display: block; min-width: 0; }
       .data-table thead { display: none; }
       .data-table tr {
@@ -474,7 +469,8 @@ interface StripDay {
       .data-table tbody tr:last-child { border-bottom: 0; }
       .data-table tr.group-row, .data-table tr.group-empty { display: block; padding: 0; }
       .group-row th { display: block; }
-      .data-table td { display: block; padding: 0 !important; border: 0; width: auto; }
+      .data-table td { display: block; padding: 0 !important; border: 0; width: auto; white-space: normal; }
+      .data-table tr.group-empty td { padding: 14px 16px !important; }
       .data-table .c-check { grid-area: check; align-self: center; margin-right: 12px; }
       .data-table .c-check:empty { display: none; }
       .c-poster { grid-area: poster; }
@@ -488,6 +484,8 @@ interface StripDay {
       .c-prices { grid-area: prices; margin-top: 2px; }
       .data-table tr[class^="st-"] { box-shadow: inset 3px 0 0 var(--st); }
       .data-table tr[class^="st-"] > td:first-child { box-shadow: none; }
+    }
+    @media (max-width: 760px) {
       .pair { grid-template-columns: minmax(0, 1fr); }
       .price-list .price-input { width: 130px; }
     }
