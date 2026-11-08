@@ -106,49 +106,49 @@ import { ToastService } from '../core/toast.service';
     </div>
   `,
   styles: `
-    .app { display: grid; grid-template-columns: 244px minmax(0, 1fr); min-height: 100dvh; }
+    .app { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-height: 100dvh; }
     svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .sidebar {
       position: sticky; top: 0; z-index: 6;
       height: 100dvh;
-      display: flex; flex-direction: column; gap: 22px;
-      padding: 16px 12px;
+      display: flex; flex-direction: column; gap: 18px;
+      padding: 14px 10px;
       background: var(--brand);
       color: var(--on-primary);
     }
-    .brand { display: flex; align-items: center; gap: 10px; padding: 2px 6px; }
-    .logo-tile { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 9px; background: var(--on-primary); }
-    .logo-tile svg { width: 26px; height: auto; stroke: none; }
+    .brand { display: flex; align-items: center; gap: 9px; padding: 2px 4px; }
+    .logo-tile { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: var(--on-primary); }
+    .logo-tile svg { width: 24px; height: auto; stroke: none; }
     .logo-tile path:last-child { stroke: var(--on-primary); }
-    .brand-name { min-width: 0; font-weight: 700; font-size: 1rem; line-height: 1.15; letter-spacing: -0.01em; }
-    .brand-name small { display: block; font-size: 0.72rem; font-weight: 500; letter-spacing: 0; opacity: 0.6; }
+    .brand-name { min-width: 0; font-weight: 700; font-size: 0.94rem; line-height: 1.15; letter-spacing: -0.01em; }
+    .brand-name small { display: block; font-size: 0.68rem; font-weight: 500; letter-spacing: 0; opacity: 0.6; }
     .brand-theatre { display: none !important; }
     .nav { display: flex; flex-direction: column; gap: 2px; }
-    .nav-group { display: block; padding: 0 10px; margin-bottom: 6px; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.45; }
+    .nav-group { display: block; padding: 0 9px; margin-bottom: 5px; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.45; }
     .nav-link {
       position: relative;
-      display: flex; align-items: center; gap: 10px;
-      min-height: 38px; padding: 6px 10px;
+      display: flex; align-items: center; gap: 9px;
+      min-height: 35px; padding: 5px 9px;
       border-radius: var(--radius);
       color: rgba(255, 255, 255, 0.72);
-      font-size: 0.875rem; font-weight: 600;
+      font-size: 0.84rem; font-weight: 600;
       text-decoration: none;
     }
-    .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .nav-link svg { width: 17px; height: 17px; flex-shrink: 0; }
     .nav-link:hover { background: rgba(255, 255, 255, 0.06); color: var(--on-primary); }
     .nav-link.on { background: rgba(255, 255, 255, 0.1); color: var(--on-primary); }
-    .nav-link.on::before { content: ''; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: #8aa6ff; }
-    .account { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-lg); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.06); }
-    .avatar, .top-avatar { flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font-size: 0.72rem; font-weight: 700; }
+    .nav-link.on::before { content: ''; position: absolute; left: -10px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: #8aa6ff; }
+    .account { margin-top: auto; display: flex; align-items: center; gap: 9px; padding: 9px; border-radius: var(--radius-lg); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.06); }
+    .avatar, .top-avatar { flex-shrink: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; font-size: 0.7rem; font-weight: 700; }
     .avatar { background: #8aa6ff; color: var(--brand); }
     .account-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-    .account-text strong { font-size: 0.82rem; }
-    .account-text small { font-size: 0.74rem; opacity: 0.6; }
-    .signout, .icon-btn { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: var(--radius); background: transparent; color: var(--on-primary); }
+    .account-text strong { font-size: 0.8rem; }
+    .account-text small { font-size: 0.72rem; opacity: 0.6; }
+    .signout, .icon-btn { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: var(--radius); background: transparent; color: var(--on-primary); }
     .signout:hover, .icon-btn:hover { background: rgba(255, 255, 255, 0.1); }
     .signout svg, .icon-btn svg { width: 18px; height: 18px; }
     .phone-only { display: none; }
-    .collapse-btn { flex-shrink: 0; margin-left: auto; display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: var(--radius); background: rgba(255, 255, 255, 0.08); color: var(--on-primary); }
+    .collapse-btn { flex-shrink: 0; margin-left: auto; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: var(--radius); background: rgba(255, 255, 255, 0.08); color: var(--on-primary); }
     .collapse-btn:hover { background: rgba(255, 255, 255, 0.16); }
     .collapse-btn svg { width: 16px; height: 16px; stroke-width: 2; }
 
