@@ -49,6 +49,15 @@ npm run build    # output in client/dist/task-manager/browser
 npm test         # unit tests (Vitest)
 ```
 
+The theatre admin app runs the same way from `admin/`:
+
+```bash
+cd admin
+npm install
+npm start        # http://localhost:4201
+npm run build    # output in admin/dist/admin/browser
+```
+
 ## Project layout
 
 ```
@@ -58,6 +67,9 @@ npm test         # unit tests (Vitest)
 │   ├── src/app/pages/      landing, movies, booking, resale, profile, wallet, search
 │   ├── src/app/shared/     navbar, footer, day strip, cards and other shared components
 │   ├── public/             film posters
+│   └── vercel.json         Vercel build settings
+├── admin/                  Theatre admin app: shows, screens and seat layouts (mock API)
+│   ├── public/             film posters and theatre logos
 │   └── vercel.json         Vercel build settings
 └── .claude/skills/verify/  how to build and drive the app in a browser to check a change
 ```
@@ -72,6 +84,10 @@ Set the project's **Root Directory** to `client`. Build settings come from
 `client/vercel.json`: `npm ci`, `npm run build`, output `dist/task-manager/browser`, and a
 rewrite of every route to `index.html` so deep links work. Leave the dashboard's build
 overrides off.
+
+The admin app is a second Vercel project from the same repository, with **Root Directory**
+set to `admin`. `admin/vercel.json` holds the same settings with output
+`dist/admin/browser`.
 
 ## Notes
 
