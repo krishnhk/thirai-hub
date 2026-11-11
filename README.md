@@ -68,7 +68,7 @@ npm run build    # output in admin/dist/admin/browser
 │   ├── src/app/shared/     navbar, footer, day strip, cards and other shared components
 │   ├── public/             film posters
 │   └── vercel.json         Vercel build settings
-├── admin/                  Theatre admin app: shows, screens and seat layouts (mock API)
+├── admin/                  Hayat Cinemas operations console (mock data); see admin/ARCHITECTURE.md
 │   ├── public/             film posters and theatre logos
 │   └── vercel.json         Vercel build settings
 └── .claude/skills/verify/  how to build and drive the app in a browser to check a change
