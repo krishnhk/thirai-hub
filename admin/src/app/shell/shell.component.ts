@@ -105,9 +105,12 @@ interface NavItem { label: string; icon: string; link: string; /** Starts a new 
             </button>
             @if (openMenu() === 'user') {
               <div class="pop user-pop">
-                <div class="pop-head"><span class="grow"><strong>{{ store.currentUser().name }}</strong><small>{{ store.currentUser().email }}</small></span></div>
-                <div class="pop-note">Signed in as {{ store.currentUser().role }}. Last sign-in {{ lastSignIn }}.</div>
-                <button type="button" class="pop-item signout" (click)="signOut()"><app-icon name="lock" /><span class="grow"><strong>Sign out</strong></span></button>
+                <div class="who-card">
+                  <strong>{{ store.currentUser().name }}</strong>
+                  <span>{{ store.currentUser().role }}</span>
+                  <small>{{ store.currentUser().email }}</small>
+                </div>
+                <button type="button" class="signout-btn" (click)="signOut()"><app-icon name="logout" />Sign out</button>
               </div>
             }
           </div>
@@ -224,7 +227,13 @@ interface NavItem { label: string; icon: string; link: string; /** Starts a new 
     .who { display: flex; flex-direction: column; line-height: 1.2; }
     .who strong, .who small { white-space: nowrap; }
     .who strong { font-size: 0.82rem; } .who small { font-size: 0.72rem; color: var(--text-muted); }
-    .user-pop { width: 290px; max-height: calc(100vh - 80px); overflow-y: auto; }
+    .user-pop { width: 290px; max-height: calc(100vh - 80px); overflow-y: auto; padding: 0; }
+    .who-card { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px 12px; border-bottom: 1px solid var(--border); }
+    .who-card strong { font-size: 0.95rem; font-weight: 700; }
+    .who-card span { font-size: 0.8rem; color: var(--text-muted); }
+    .who-card small { font-size: 0.76rem; color: var(--text-faint); overflow-wrap: anywhere; }
+    .signout-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 600; font-size: 0.86rem; text-align: left; cursor: pointer; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+    .signout-btn:hover { color: var(--danger); background: var(--surface-3, transparent); }
     .pop-sub { padding: 8px 10px 4px; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
     .avatar.sm { width: 26px; height: 26px; font-size: 0.62rem; }
 
