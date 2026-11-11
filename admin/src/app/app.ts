@@ -1,21 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { ToastService } from './core/toast.service';
+import { ThemeService } from './core/theme';
+import { PrintHostComponent } from './shared/counter-ticket.component';
+import { FeedbackHostComponent } from './shared/feedback-host.component';
+import { SplashComponent } from './shared/splash.component';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet],
-  template: `
-    <router-outlet />
-    <div class="toast-wrap" role="status" aria-live="polite">
-      @for (t of toasts.toasts(); track t.id) {
-        <div class="toast" [class.bad]="t.bad">{{ t.text }}</div>
-      }
-    </div>
-  `,
+  imports: [RouterOutlet, FeedbackHostComponent, PrintHostComponent, SplashComponent],
+  template: `<app-splash /><router-outlet /><app-feedback-host /><app-print-host />`,
 })
 export class App {
-  readonly toasts = inject(ToastService);
+  /** Injected so the saved theme is applied as soon as the app starts. */
+  private readonly theme = inject(ThemeService);
 }

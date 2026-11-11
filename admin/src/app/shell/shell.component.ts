@@ -1,266 +1,338 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, computed, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 
-import { AdminStore } from '../core/admin-store';
+import { ALL_THEATRES, AdminStore } from '../core/admin-store';
+import { formatRelative, initials } from '../core/format';
+import { IconComponent } from '../shared/icon.component';
 import { AuthService } from '../core/auth.service';
-import { LayoutDrafts } from '../core/layout-drafts';
-import { ToastService } from '../core/toast.service';
+import { ThemeService } from '../core/theme';
+
+interface NavItem { label: string; icon: string; link: string; /** Starts a new group: a thin divider above it. */ gap?: boolean; }
 
 /**
- * The frame every signed-in page sits in: a dark navigation sidebar with the account, a top bar with the theatre and
- * today's date, and the page. On phones the sidebar folds into a two-row header: brand and sign out, then the sections.
+ * The frame of every page: a sidebar with the eleven sections and a header with the theatre
+ * selector, notifications, the theme switch and the user.
+ * On narrow screens the sidebar slides in over the page.
  */
 @Component({
   selector: 'app-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent],
   template: `
-    <div class="app" [class.collapsed]="collapsed()">
-      <aside class="sidebar" [class.collapsed]="collapsed()">
-        <div class="brand">
-          <button
-            type="button"
-            class="logo-tile"
-            (click)="toggleCollapsed()"
-            [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-            [attr.data-tip]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-          >
-            <svg viewBox="4 12 56 40" focusable="false">
-              <path d="M10 16h44a3 3 0 0 1 3 3v8a5 5 0 0 0 0 10v8a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3v-8a5 5 0 0 0 0-10v-8a3 3 0 0 1 3-3z" fill="var(--brand)" />
-              <path d="M20 25l12 7-12 7z" fill="var(--on-primary)" />
-              <path d="M44 20v24" stroke="var(--on-primary)" stroke-width="2.4" stroke-dasharray="3.5 3.5" />
-            </svg>
+    <div class="app" [class.collapsed]="collapsed()" [class.drawer-open]="drawerOpen()">
+      <aside class="sidebar" aria-label="Main navigation">
+        <!-- Theatre -->
+        <div class="pop-wrap theatre-wrap">
+          <button class="theatre-btn" type="button" [class.single]="!multiTheatre() && !collapsed()" [attr.aria-expanded]="multiTheatre() ? openMenu() === 'theatre' : null" [attr.aria-haspopup]="multiTheatre() ? 'listbox' : null" [attr.title]="collapsed() ? 'Expand sidebar' : null" (click)="collapsed() ? collapsed.set(false) : multiTheatre() && toggle('theatre')">
+            @if (selectedTheatre(); as t) {
+              <span class="t-logo" [class.mono]="!t.logoUrl">@if (t.logoUrl) { <img [src]="t.logoUrl" alt="" /> } @else { {{ initialsOf(t.name) }} }</span>
+              <span class="t-text"><strong>{{ t.name }}</strong><small>ThiraiHub</small></span>
+            } @else {
+              <span class="t-logo all"><app-icon name="theatre" /></span>
+              <span class="t-text"><strong>All theatres</strong><small>ThiraiHub</small></span>
+            }
+            @if (multiTheatre()) { <app-icon name="chevronDown" /> }
           </button>
-          <span class="brand-name">
-            ThiraiHub
-            <small class="brand-sub">Theatre admin</small>
-            <small class="brand-theatre">{{ theatreName() }}</small>
-          </span>
-          <button type="button" class="collapse-btn" (click)="toggleCollapsed()" [attr.aria-expanded]="!collapsed()" aria-label="Collapse sidebar" title="Collapse sidebar">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 6l-6 6 6 6" /></svg>
+          <button class="collapse" type="button" [attr.title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'" [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'" (click)="collapsed.set(!collapsed())">
+            <app-icon [name]="collapsed() ? 'chevronRight' : 'chevronLeft'" />
           </button>
-          @if (store.theatre()?.logoUrl; as logo) {
-            <span class="theatre-logo phone-only" aria-hidden="true"><img [src]="logo" alt="" /></span>
+          @if (openMenu() === 'theatre') {
+            <div class="pop theatre-pop" role="listbox" aria-label="Choose a theatre">
+              @if (store.theatres().length > 1) {
+              <button type="button" role="option" class="pop-item" [attr.aria-selected]="store.selectedTheatreId() === all" (click)="chooseTheatre(all)">
+                <span class="t-logo all"><app-icon name="theatre" /></span>
+                <span class="grow"><strong>All theatres</strong><small>{{ store.theatres().length }} theatres · {{ store.screens().length }} screens</small></span>
+                @if (store.selectedTheatreId() === all) { <app-icon name="check" /> }
+              </button>
+              }
+              @for (t of store.theatres(); track t.id) {
+                <button type="button" role="option" class="pop-item" [attr.aria-selected]="store.selectedTheatreId() === t.id" (click)="chooseTheatre(t.id)">
+                  <span class="t-logo" [class.mono]="!t.logoUrl">@if (t.logoUrl) { <img [src]="t.logoUrl" alt="" /> } @else { {{ initialsOf(t.name) }} }</span>
+                  <span class="grow"><strong>{{ t.name }}</strong><small>{{ t.area }} · {{ t.code }}@if (t.status === 'inactive') { · Inactive }</small></span>
+                  @if (store.selectedTheatreId() === t.id) { <app-icon name="check" /> }
+                </button>
+              }
+            </div>
           }
-          <button class="icon-btn phone-only" type="button" (click)="signOut()" aria-label="Sign out" title="Sign out">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 8l-4 4 4 4M6 12h10" /></svg>
-          </button>
         </div>
 
-        <nav class="nav" aria-label="Admin sections">
-          <span class="nav-group">Operations</span>
-          <a class="nav-link" routerLink="/shows" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }" data-tip="Shows">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" /><path d="M3.5 10h17M8 3v4M16 3v4" /></svg>
-            <span>Shows</span>
-          </a>
-          <a class="nav-link" routerLink="/screens" routerLinkActive="on" data-tip="Screens and seats">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7c5-2.5 11-2.5 16 0" /><rect x="5" y="11" width="4" height="3.5" rx="1" /><rect x="10" y="11" width="4" height="3.5" rx="1" /><rect x="15" y="11" width="4" height="3.5" rx="1" /><rect x="5" y="16.5" width="4" height="3.5" rx="1" /><rect x="10" y="16.5" width="4" height="3.5" rx="1" /><rect x="15" y="16.5" width="4" height="3.5" rx="1" /></svg>
-            <span>Screens and seats</span>
-          </a>
+        <nav class="nav">
+          @for (item of navItems(); track item.link) {
+            @if (item.gap) { <span class="nav-gap" aria-hidden="true"></span> }
+            <a class="nav-link" [routerLink]="item.link" routerLinkActive="active" [attr.data-tip]="item.label" (click)="drawerOpen.set(false)">
+              <app-icon [name]="item.icon" />
+              <span>{{ item.label }}</span>
+              @if (item.link === '/refunds' && pendingRefunds()) { <span class="nav-count">{{ pendingRefunds() }}</span> }
+              @if (item.link === '/shows' && draftCount()) { <span class="nav-count violet">{{ draftCount() }}</span> }
+            </a>
+          }
         </nav>
 
-        <div class="account">
-          <span class="avatar" aria-hidden="true">TA</span>
-          <div class="account-text">
-            <strong>Theatre admin</strong>
-            <small class="num">+91 ••••{{ auth.maskedPhone }}</small>
+        <div class="dock">
+          <div class="pop-wrap">
+            <button class="nav-link bell-link" type="button" data-tip="Notifications" [attr.aria-expanded]="openMenu() === 'bell'" (click)="toggle('bell')">
+              <app-icon name="bell" />
+              <span>Notifications</span>
+              @if (store.alerts().length) { <span class="nav-count alert">{{ store.alerts().length }}</span> }
+            </button>
+            @if (openMenu() === 'bell') {
+              <div class="pop bell-pop">
+                <div class="pop-head"><strong>Notifications</strong><span class="muted small">{{ store.alerts().length }} open</span></div>
+                @for (a of store.alerts().slice(0, 8); track a.id) {
+                  <a class="pop-item alert-item" [routerLink]="a.link.split('?')[0]" [queryParams]="queryOf(a.link)" (click)="openMenu.set(null); drawerOpen.set(false)">
+                    <span class="lvl {{ a.level }}"></span>
+                    <span class="grow"><strong>{{ a.title }}</strong><small>{{ a.detail }}</small></span>
+                  </a>
+                } @empty {
+                  <p class="pop-empty">Nothing needs attention.</p>
+                }
+              </div>
+            }
           </div>
-          <button class="signout" type="button" (click)="signOut()" aria-label="Sign out" data-tip="Sign out">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 8l-4 4 4 4M6 12h10" /></svg>
+
+          <button class="nav-link" type="button" [attr.data-tip]="nextTheme() === 'light' ? 'Light theme' : 'Dark theme'" (click)="themes.set(nextTheme())">
+            <app-icon [name]="nextTheme() === 'light' ? 'sun' : 'moon'" />
+            <span>{{ nextTheme() === 'light' ? 'Light theme' : 'Dark theme' }}</span>
           </button>
+
+          <div class="pop-wrap">
+            <button class="profile" type="button" [attr.data-tip]="store.currentUser().name" [attr.aria-expanded]="openMenu() === 'user'" (click)="toggle('user')">
+              <span class="avatar">{{ store.currentUser().initials }}</span>
+              <span class="who"><strong>{{ store.currentUser().name }}</strong><small>{{ store.currentUser().role }}</small></span>
+              <app-icon class="chev" name="chevronUp" />
+            </button>
+            @if (openMenu() === 'user') {
+              <div class="pop user-pop">
+                <div class="pop-head"><span class="grow"><strong>{{ store.currentUser().name }}</strong><small>{{ store.currentUser().email }}</small></span></div>
+                <div class="pop-sub">Switch user (prototype)</div>
+                @for (u of store.staffUsers(); track u.id) {
+                  <button type="button" class="pop-item" [attr.aria-selected]="store.currentUser().name === u.name" (click)="switchUser(u.id)">
+                    <span class="avatar sm">{{ u.initials }}</span>
+                    <span class="grow"><strong>{{ u.name }}</strong><small>{{ u.role }}@if (u.counter) { · {{ u.counter }} }</small></span>
+                    @if (store.currentUser().name === u.name) { <app-icon name="check" /> }
+                  </button>
+                }
+                <div class="pop-note">Signed in as {{ store.currentUser().role }}. Last sign-in {{ lastSignIn }}.</div>
+                <button type="button" class="pop-item signout" (click)="signOut()"><app-icon name="lock" /><span class="grow"><strong>Sign out</strong></span></button>
+              </div>
+            }
+          </div>
+
         </div>
       </aside>
+      <div class="drawer-scrim" (click)="drawerOpen.set(false)"></div>
 
       <div class="main">
         <header class="topbar">
-          <div class="venue">
-            <span class="venue-icon" aria-hidden="true">
-              @if (store.theatre()?.logoUrl; as logo) {
-                <img [src]="logo" alt="" />
-              } @else {
-                <svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11" /><path d="M9 20v-6h6v6" /></svg>
-              }
-            </span>
-            <div class="venue-text">
-              <small>Theatre</small>
-              <strong>{{ theatreName() }}</strong>
-            </div>
-          </div>
-          <div class="top-right">
-            <span class="today num">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" /><path d="M3.5 10h17M8 3v4M16 3v4" /></svg>
-              {{ today }}
-            </span>
-            <span class="top-avatar" aria-hidden="true">TA</span>
-          </div>
+          <button class="btn ghost icon menu-btn" type="button" aria-label="Open navigation" (click)="drawerOpen.set(true)"><app-icon name="sidebar" /></button>
+          @if (selectedTheatre(); as t) {
+            <span class="t-logo" [class.mono]="!t.logoUrl">@if (t.logoUrl) { <img [src]="t.logoUrl" alt="" /> } @else { {{ initialsOf(t.name) }} }</span>
+            <span class="t-text"><strong>{{ t.name }}</strong><small>{{ t.area }}</small></span>
+          }
         </header>
 
         <main class="content">
-          @if (store.ready()) {
-            <router-outlet />
-          } @else {
-            <div class="loading" role="status">Loading your theatre…</div>
-          }
+          <router-outlet />
         </main>
       </div>
     </div>
   `,
   styles: `
-    .app { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-height: 100dvh; }
-    svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .sidebar {
-      position: sticky; top: 0; z-index: 6;
-      height: 100dvh;
-      display: flex; flex-direction: column; gap: 18px;
-      padding: 14px 10px;
-      background: var(--brand);
-      color: var(--on-primary);
-    }
-    .brand { display: flex; align-items: center; gap: 9px; padding: 2px 4px; }
-    .logo-tile { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: var(--on-primary); }
-    .logo-tile svg { width: 24px; height: auto; stroke: none; }
-    .logo-tile path:last-child { stroke: var(--on-primary); }
-    .brand-name { min-width: 0; font-weight: 700; font-size: 0.94rem; line-height: 1.15; letter-spacing: -0.01em; }
-    .brand-name small { display: block; font-size: 0.68rem; font-weight: 500; letter-spacing: 0; opacity: 0.6; }
-    .brand-theatre { display: none !important; }
-    .nav { display: flex; flex-direction: column; gap: 2px; }
-    .nav-group { display: block; padding: 0 9px; margin-bottom: 5px; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.45; }
-    .nav-link {
-      position: relative;
-      display: flex; align-items: center; gap: 9px;
-      min-height: 35px; padding: 5px 9px;
-      border-radius: var(--radius);
-      color: rgba(255, 255, 255, 0.72);
-      font-size: 0.84rem; font-weight: 600;
-      text-decoration: none;
-    }
-    .nav-link svg { width: 17px; height: 17px; flex-shrink: 0; }
-    .nav-link:hover { background: rgba(255, 255, 255, 0.06); color: var(--on-primary); }
-    .nav-link.on { background: rgba(255, 255, 255, 0.1); color: var(--on-primary); }
-    .nav-link.on::before { content: ''; position: absolute; left: -10px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: #8aa6ff; }
-    .account { margin-top: auto; display: flex; align-items: center; gap: 9px; padding: 9px; border-radius: var(--radius-lg); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.06); }
-    .avatar, .top-avatar { flex-shrink: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; font-size: 0.7rem; font-weight: 700; }
-    .avatar { background: #8aa6ff; color: var(--brand); }
-    .account-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-    .account-text strong { font-size: 0.8rem; }
-    .account-text small { font-size: 0.72rem; opacity: 0.6; }
-    .signout, .icon-btn { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: var(--radius); background: transparent; color: var(--on-primary); }
-    .signout:hover, .icon-btn:hover { background: rgba(255, 255, 255, 0.1); }
-    .signout svg, .icon-btn svg { width: 18px; height: 18px; }
-    .phone-only { display: none; }
-    .collapse-btn { flex-shrink: 0; margin-left: auto; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: var(--radius); background: rgba(255, 255, 255, 0.08); color: var(--on-primary); }
-    .collapse-btn:hover { background: rgba(255, 255, 255, 0.16); }
-    .collapse-btn svg { width: 16px; height: 16px; stroke-width: 2; }
+    .app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); min-height: 100vh; }
+    .app.collapsed { grid-template-columns: 68px minmax(0, 1fr); }
+    /* Flush with the window edges; only its right side lifts off the page with a shadow. */
+    .sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 14px; padding: 16px 12px; background: var(--sidebar-bg); border-right: 1px solid var(--border-soft); box-shadow: var(--shadow-side); z-index: 40; }
+    .nav { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; scrollbar-width: none; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-gap { height: 1px; margin: 8px 10px; background: var(--border-soft); }
+    button.nav-link { width: 100%; border: 0; background: none; text-align: left; }
+    .nav-link { position: relative; display: flex; align-items: center; gap: 11px; min-height: 36px; padding: 6px 10px; border-radius: var(--radius); color: var(--text-muted); font-size: 0.86rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    .nav-link:hover { background: var(--surface-2); color: var(--text); }
+    .nav-link.active { background: var(--accent-soft); color: var(--accent); }
+    .nav-link.active::before { content: ''; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+    .nav-count { margin-left: auto; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--warning-soft); color: var(--warning); font-size: 0.7rem; font-weight: 700; line-height: 18px; text-align: center; }
+    .nav-count.violet { background: var(--violet-soft); color: var(--violet); }
+    .nav-count.alert { background: var(--danger); color: #fff; }
+    .dock { position: relative; display: flex; flex-direction: column; gap: 2px; padding-top: 10px; border-top: 1px solid var(--border-soft); }
+    .dock .pop-wrap { position: static; }
+    .theatre-wrap { position: static; display: flex; align-items: center; gap: 2px; padding-bottom: 12px; border-bottom: 1px solid var(--border-soft); }
+    .dock .pop, .theatre-wrap .pop { right: auto; left: calc(100% + 22px); }
+    .dock .pop { top: auto; bottom: 0; }
+    .theatre-wrap .pop { top: 70px; left: calc(100% + 10px); }
+    .collapse { flex: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: var(--radius-sm); background: none; color: var(--text-muted); }
+    .collapse:hover { background: var(--surface-2); color: var(--text); }
+    .collapsed .nav-link span { display: none; }
+    .collapsed .collapse { display: none; }
+    .collapsed .theatre-btn { flex: none; width: 100%; }
+    .collapsed .theatre-btn { border-color: transparent; background: none; cursor: pointer; }
+    .collapsed .theatre-btn:hover { background: var(--surface-2); border-color: transparent; }
+    .collapsed .theatre-btn { height: 44px; padding: 0; border-radius: var(--radius); overflow: hidden; }
+    .collapsed .t-logo { width: 44px; height: 44px; padding: 5px; border-radius: var(--radius); }
+    .collapsed .theatre-btn:hover .t-logo { filter: brightness(0.94); }
+    .collapsed .nav-link { justify-content: center; padding: 6px 0; }
+    .collapsed .nav { overflow: visible; }
+    .collapsed .theatre-btn { justify-content: center; padding: 4px 0; }
+    .collapsed .t-text, .collapsed .theatre-btn > app-icon, .collapsed .who, .collapsed .profile .chev { display: none; }
+    .collapsed .profile { justify-content: center; padding: 0; }
+    .collapsed .bell-link .nav-count { display: block; position: absolute; top: 5px; right: 14px; width: 8px; height: 8px; min-width: 0; padding: 0; font-size: 0; line-height: 0; }
+    .collapsed .nav-link:hover::after, .collapsed .profile:hover::after { z-index: 80; }
+    .collapsed .profile:hover::after { content: attr(data-tip); position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%); padding: 5px 9px; border-radius: var(--radius-sm); background: var(--surface-3); border: 1px solid var(--border-strong); color: var(--text); font-size: 0.78rem; font-weight: 600; white-space: nowrap; box-shadow: var(--shadow); pointer-events: none; }
+    .collapsed .dock { overflow: visible; }
+    .collapsed .nav-link:hover::after, .collapsed .nav-link:focus-visible::after { content: attr(data-tip); position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%); padding: 5px 9px; border-radius: var(--radius-sm); background: var(--surface-3); border: 1px solid var(--border-strong); color: var(--text); font-size: 0.78rem; font-weight: 600; white-space: nowrap; box-shadow: var(--shadow); pointer-events: none; z-index: 50; }
+    .drawer-scrim { display: none; }
 
     .main { min-width: 0; display: flex; flex-direction: column; }
-    .topbar {
-      position: sticky; top: 0; z-index: 4;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      height: 60px; padding: 0 clamp(16px, 3vw, 32px);
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-    }
-    .venue { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .venue-icon, .theatre-logo { flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px; padding: 5px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); color: var(--text-soft); }
-    .venue-icon img, .theatre-logo img { width: 100%; height: 100%; object-fit: contain; }
-    .theatre-logo { width: 34px; height: 34px; padding: 4px; border: 0; }
-    .sidebar .theatre-logo { display: none; }
-    .venue-icon svg { width: 18px; height: 18px; }
-    .venue-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
-    .venue-text small { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
-    .venue-text strong { font-size: 0.92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .top-right { display: flex; align-items: center; gap: 14px; }
-    .today { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--surface-2); font-size: 0.82rem; font-weight: 600; color: var(--text-soft); }
-    .today svg { width: 15px; height: 15px; color: var(--text-muted); }
-    .top-avatar { background: var(--brand); color: var(--on-primary); }
-    .content { flex: 1; min-width: 0; width: 100%; padding: 28px clamp(16px, 3vw, 32px) 56px; }
-    .loading { padding: 60px 0; text-align: center; color: var(--text-muted); }
+    .topbar { display: none; }
+    .menu-btn { display: none; }
+    .content { flex: 1; min-width: 0; padding: 24px 28px 48px; }
 
-    /* Tooltips for the logo, the rail icons and sign out */
-    .logo-tile::after,
-    .sidebar.collapsed .nav-link::after,
-    .sidebar.collapsed .signout::after {
-      content: attr(data-tip);
-      position: absolute; left: calc(100% + 14px); top: 50%; transform: translateY(-50%);
-      padding: 6px 10px; border-radius: var(--radius);
-      background: var(--brand); color: var(--on-primary); box-shadow: var(--shadow-lg);
-      font-size: 0.8rem; font-weight: 600; white-space: nowrap;
-      opacity: 0; pointer-events: none; transition: opacity 120ms ease;
-    }
-    .logo-tile:hover::after, .logo-tile:focus-visible::after,
-    .sidebar.collapsed .nav-link:hover::after, .sidebar.collapsed .nav-link:focus-visible::after,
-    .sidebar.collapsed .signout:hover::after { opacity: 1; }
-    .logo-tile:focus-visible { outline: 2px solid var(--on-primary); outline-offset: 2px; }
-    /* Expanded, the logo is only the logo: no click and no tooltip */
-    .sidebar:not(.collapsed) .logo-tile { pointer-events: none; cursor: default; }
+    .pop-wrap { position: relative; }
+    .pop { position: absolute; top: calc(100% + 8px); z-index: 60; min-width: 260px; padding: 6px; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: var(--surface-2); box-shadow: var(--shadow-lg); }
+    .pop-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: var(--radius); background: none; color: var(--text); text-align: left; text-decoration: none; }
+    .pop-item:hover, .pop-item[aria-selected='true'] { background: var(--surface-3); }
+    .pop-item .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .pop-item strong { font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pop-item small { font-size: 0.74rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pop-item app-icon { color: var(--text-muted); }
+    .pop-item[aria-selected='true'] app-icon { color: var(--accent); }
+    .pop-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+    .pop-head .grow { display: flex; flex-direction: column; } .pop-head small { color: var(--text-muted); font-size: 0.74rem; }
+    .pop-empty { padding: 14px 10px; color: var(--text-muted); font-size: 0.85rem; }
+    .pop-foot { display: block; padding: 9px 10px 4px; border-top: 1px solid var(--border); margin-top: 4px; font-size: 0.8rem; font-weight: 600; }
+    .signout { margin-top: 4px; border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); }
+    .signout:hover { color: var(--danger); }
+    .pop-note { padding: 8px 10px 4px; border-top: 1px solid var(--border); margin-top: 4px; font-size: 0.74rem; color: var(--text-muted); }
 
-    @media (min-width: 900px) {
-      .app.collapsed { grid-template-columns: 68px minmax(0, 1fr); }
-      .sidebar.collapsed { padding: 16px 10px; }
-      .sidebar.collapsed .brand { justify-content: center; padding: 2px 0; }
-      .sidebar.collapsed .brand-name,
-      .sidebar.collapsed .nav-group,
-      .sidebar.collapsed .account-text,
-      .sidebar.collapsed .avatar,
-      .sidebar.collapsed .collapse-btn,
-      .sidebar.collapsed .nav-link span { display: none; }
-      .sidebar.collapsed .nav-link { justify-content: center; padding: 8px 0; }
-      .sidebar.collapsed .nav-link.on::before { left: -10px; }
-      .sidebar.collapsed .account { justify-content: center; padding: 6px 0; background: none; border: 0; }
-    }
+    /* Every control in the bar is 36 px tall. */
+    .theatre-btn { display: flex; align-items: center; gap: 10px; flex: 1; width: auto; min-width: 0; height: 48px; flex-shrink: 0; padding: 0 10px 0 6px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-align: left; }
+    .theatre-btn:hover { border-color: var(--border-strong); }
+    .theatre-btn.single { cursor: default; border-color: transparent; background: none; }
+    .theatre-btn.single:hover { border-color: transparent; }
+    .theatre-btn > app-icon { color: var(--text-muted); width: 16px; height: 16px; }
+    .t-logo { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; padding: 3px; border-radius: var(--radius-sm); background: #fff; overflow: hidden; }
+    .t-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .t-logo.mono { background: var(--accent); color: var(--on-accent); font-size: 0.78rem; font-weight: 800; }
+    .t-logo.all { background: var(--accent-soft); color: var(--accent); }
+    .t-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+    .t-text small { font-size: 0.7rem; color: var(--text-muted); }
+    .t-text strong { font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .theatre-pop { left: 0; width: 320px; max-height: 420px; overflow-y: auto; }
 
-    /* Phones: a two-row header with the brand and sign out, then the sections */
-    @media (max-width: 899px) {
-      .app { grid-template-columns: minmax(0, 1fr); }
-      .sidebar { position: sticky; top: 0; z-index: 5; height: auto; gap: 12px; padding: 12px 14px; }
-      .brand { padding: 0; }
-      .brand-sub { display: none !important; }
-      .brand-theatre { display: block !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .collapse-btn, .account, .nav-group, .topbar { display: none; }
-      .phone-only { display: grid; }
-      .phone-only:first-of-type { margin-left: auto; }
-      .brand .phone-only { margin-left: 0; }
-      .brand-name { flex: 1; }
-      .sidebar .theatre-logo { display: grid; }
-      .nav { flex-direction: row; gap: 4px; padding: 3px; border-radius: var(--radius); background: rgba(255, 255, 255, 0.06); }
-      .nav-link { flex: 1; justify-content: center; min-height: 34px; padding: 6px 8px; font-size: 0.84rem; }
-      .nav-link span { white-space: nowrap; }
-      .nav-link.on { background: var(--on-primary); color: var(--brand); }
-      .nav-link.on::before { display: none; }
-      .content { padding: 20px 14px 48px; }
+    .bell-pop { width: 360px; }
+    .alert-item { align-items: flex-start; }
+    .lvl { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; flex-shrink: 0; }
+    .lvl.danger { background: var(--danger); } .lvl.warning { background: var(--warning); } .lvl.info { background: var(--info); }
+
+    .profile .chev { width: 14px; height: 14px; margin-left: auto; color: var(--text-muted); }
+    .profile { position: relative; display: flex; align-items: center; gap: 9px; width: 100%; height: 48px; padding: 0 8px 0 6px; border: 0; border-radius: var(--radius); background: none; color: var(--text); text-align: left; }
+    .profile:hover { background: var(--surface-2); }
+    .avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 0.72rem; font-weight: 800; flex-shrink: 0; }
+    .who { display: flex; flex-direction: column; line-height: 1.2; }
+    .who strong, .who small { white-space: nowrap; }
+    .who strong { font-size: 0.82rem; } .who small { font-size: 0.72rem; color: var(--text-muted); }
+    .user-pop { width: 290px; max-height: calc(100vh - 80px); overflow-y: auto; }
+    .pop-sub { padding: 8px 10px 4px; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .avatar.sm { width: 26px; height: 26px; font-size: 0.62rem; }
+
+    @media (max-width: 1023px) {
+      .app, .app.collapsed { grid-template-columns: minmax(0, 1fr); }
+      .sidebar { position: fixed; inset: 0 auto 0 0; height: auto; width: 260px; transform: translateX(calc(-100% - 30px)); transition: transform 180ms ease; }
+      .drawer-open .sidebar { transform: none; }
+      .drawer-open .drawer-scrim { display: block; position: fixed; inset: 0; z-index: 35; background: var(--scrim); }
+      .collapse { display: none; }
+      .collapsed .nav-link span { display: initial; }
+      .menu-btn { display: inline-flex; }
+      .topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px; height: var(--header-h); padding: 0 14px; background: var(--topbar-bg); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-soft); }
+      .dock .pop { left: 0; right: 0; width: auto; bottom: calc(100% + 8px); }
+      .theatre-wrap .pop { left: 0; right: 0; width: auto; top: 70px; }
+      .collapsed .t-text, .collapsed .who { display: flex; }
+      .collapsed .profile .chev { display: block; }
+      .collapsed .theatre-btn, .collapsed .profile { justify-content: flex-start; }
+      .content { padding: 18px 16px 40px; }
     }
   `,
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent {
   readonly store = inject(AdminStore);
-  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly toast = inject(ToastService);
-  private readonly drafts = inject(LayoutDrafts);
+  private readonly host = inject(ElementRef<HTMLElement>);
 
-  /** Whether the sidebar is folded to an icon rail on wide screens. */
+  readonly all = ALL_THEATRES;
+  protected readonly auth = inject(AuthService);
+  protected readonly themes = inject(ThemeService);
+  protected readonly nextTheme = computed(() => (this.themes.theme() === 'dark' ? 'light' : 'dark'));
+  readonly initialsOf = initials;
+  /** One theatre: the entry is its page ("Theatre"), not a list. */
+  readonly navItems = computed(() => {
+    const single = this.store.theatres().length === 1;
+    return this.nav
+      .filter((i) => !(single && i.link === '/screens'))
+      .map((i) => (single && i.link === '/theatres' ? { ...i, label: 'Theatre' } : i));
+  });
+  /** In the order the day goes: run the box office and the shows, handle cancellations and refunds; then the catalogue and reports; then setup. */
+  readonly nav: NavItem[] = [
+    { label: 'Overview', icon: 'overview', link: '/overview' },
+    { label: 'Counter Booking', icon: 'ticket', link: '/counter' },
+    { label: 'Shows', icon: 'shows', link: '/shows' },
+    { label: 'Refunds', icon: 'refund', link: '/refunds' },
+    { label: 'Movies', icon: 'movie', link: '/movies', gap: true },
+    { label: 'Reports', icon: 'reports', link: '/reports' },
+    { label: 'Theatres', icon: 'theatre', link: '/theatres', gap: true },
+    { label: 'Screens', icon: 'screen', link: '/screens' },
+    { label: 'Settings', icon: 'settings', link: '/settings' },
+  ];
+  readonly lastSignIn = formatRelative(new Date(Date.now() - 3 * 3_600_000));
+
   readonly collapsed = signal(false);
+  readonly drawerOpen = signal(false);
+  readonly openMenu = signal<'theatre' | 'bell' | 'user' | null>(null);
 
-  /** Today's date, shown in the top bar. */
-  readonly today = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-
-  ngOnInit(): void {
-    this.store.load();
+  readonly selectedTheatre = computed(() => this.store.theatre(this.store.selectedTheatreId()) ?? null);
+  readonly pendingRefunds = computed(() => this.store.scopedRefunds().filter((r) => r.status === 'pending' || r.status === 'approved' || r.status === 'failed').length);
+  readonly draftCount = computed(() => this.store.scopedShows().filter((s) => s.publication === 'draft' && s.start > this.store.now()).length);
+  /** The theatre switcher only does something when there is more than one theatre. */
+  readonly multiTheatre = computed(() => this.store.theatres().length > 1);
+  constructor() {
+    // Close menus and the drawer whenever the page changes.
+    toSignal(this.router.events.pipe(filter((e) => e instanceof NavigationEnd), map(() => {
+      this.openMenu.set(null);
+      this.drawerOpen.set(false);
+      return true;
+    })));
   }
 
-  theatreName(): string {
-    return this.store.theatre()?.name ?? 'Your theatre';
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.pop-wrap')) this.openMenu.set(null);
   }
 
-  toggleCollapsed(): void {
-    this.collapsed.update((value) => !value);
+  toggle(menu: 'theatre' | 'bell' | 'user'): void {
+    this.openMenu.update((m) => (m === menu ? null : menu));
+  }
+
+  switchUser(id: string): void {
+    this.store.signInAs(id);
+    this.auth.setUser(id);
+    this.openMenu.set(null);
   }
 
   signOut(): void {
+    this.openMenu.set(null);
     this.auth.signOut();
-    this.drafts.clearAll();
-    this.toast.show('Signed out.');
     void this.router.navigateByUrl('/sign-in');
+  }
+
+  chooseTheatre(id: string): void {
+    this.store.selectedTheatreId.set(id);
+    this.openMenu.set(null);
+  }
+
+  queryOf(link: string): Record<string, string> | null {
+    const q = link.split('?')[1];
+    if (!q) return null;
+    return Object.fromEntries(new URLSearchParams(q).entries());
   }
 }

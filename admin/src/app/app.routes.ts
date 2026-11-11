@@ -1,25 +1,51 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanDeactivateFn, Router, Routes } from '@angular/router';
 
+import { AdminStore } from './core/admin-store';
 import { authGuard } from './core/auth.guard';
-import { ShellComponent } from './shell/shell.component';
-import { ShowsComponent } from './shows/shows.component';
-import { ScreenDesignerComponent } from './screens/screen-designer.component';
-import { ScreenDetailComponent } from './screens/screen-detail.component';
-import { ScreensComponent } from './screens/screens.component';
-import { SignInComponent } from './sign-in/sign-in.component';
 
+import { ShellComponent } from './shell/shell.component';
+
+/** Asks pages with unsaved work (they implement canLeave) before the user navigates away. */
+const leaveGuard: CanDeactivateFn<{ canLeave?: () => boolean | Promise<boolean> }> = (page) => (page.canLeave ? page.canLeave() : true);
+
+/** One theatre: its page is where theatre and screen management live. */
+const theatrePage = (tab?: string) => () => {
+  const first = inject(AdminStore).theatres()[0];
+  return first ? inject(Router).createUrlTree(['/theatres', first.id], tab ? { queryParams: { tab } } : {}) : '/overview';
+};
+
+/** Every section loads on demand, so the first screen stays fast. */
 export const routes: Routes = [
-  { path: 'sign-in', title: 'Sign in · ThiraiHub admin', component: SignInComponent },
+  { path: 'sign-in', title: 'Sign in', loadComponent: () => import('./features/auth/sign-in.page').then((m) => m.SignInPage) },
   {
     path: '',
     component: ShellComponent,
     canActivate: [authGuard],
     children: [
-      { path: 'shows', title: 'Shows · ThiraiHub admin', component: ShowsComponent },
-      { path: 'screens', title: 'Screens and seats · ThiraiHub admin', component: ScreensComponent },
-      { path: 'screens/:screenId', title: 'Screen · ThiraiHub admin', component: ScreenDetailComponent },
-      { path: 'screens/:screenId/edit', title: 'Build layout · ThiraiHub admin', component: ScreenDesignerComponent },
-      { path: '', pathMatch: 'full', redirectTo: 'shows' },
+      { path: 'overview', title: 'Overview', loadComponent: () => import('./features/overview/overview.page').then((m) => m.OverviewPage) },
+      { path: 'theatres', pathMatch: 'full', redirectTo: theatrePage() },
+      { path: 'theatres/:theatreId', title: 'Theatre', loadComponent: () => import('./features/theatres/theatre-detail.page').then((m) => m.TheatreDetailPage) },
+      { path: 'screens', pathMatch: 'full', redirectTo: theatrePage('screens') },
+      { path: 'screens/:screenId', title: 'Screen', loadComponent: () => import('./features/screens/screen-detail.page').then((m) => m.ScreenDetailPage) },
+      { path: 'seats/:screenId', title: 'Seat designer', canDeactivate: [leaveGuard], loadComponent: () => import('./features/seats/seat-designer.page').then((m) => m.SeatDesignerPage) },
+      { path: 'movies', title: 'Movies', loadComponent: () => import('./features/movies/movies.page').then((m) => m.MoviesPage) },
+      { path: 'movies/:movieId', title: 'Movie', loadComponent: () => import('./features/movies/movie-detail.page').then((m) => m.MovieDetailPage) },
+      { path: 'shows', title: 'Shows', loadComponent: () => import('./features/shows/shows.page').then((m) => m.ShowsPage) },
+      { path: 'shows/new', title: 'Create show', loadComponent: () => import('./features/shows/show-editor.page').then((m) => m.ShowEditorPage) },
+      { path: 'shows/:showId/edit', title: 'Edit show', loadComponent: () => import('./features/shows/show-editor.page').then((m) => m.ShowEditorPage) },
+      { path: 'shows/:showId', title: 'Show', loadComponent: () => import('./features/shows/show-detail.page').then((m) => m.ShowDetailPage) },
+      { path: 'counter', title: 'Counter Booking', loadComponent: () => import('./features/counter/counter.page').then((m) => m.CounterPage) },
+      { path: 'counter/history', title: 'Counter history', loadComponent: () => import('./features/counter/counter-history.page').then((m) => m.CounterHistoryPage) },
+      { path: 'counter/dashboard', title: 'Counter dashboard', loadComponent: () => import('./features/counter/counter-dashboard.page').then((m) => m.CounterDashboardPage) },
+      { path: 'shows/:showId/cancel', title: 'Cancel show', loadComponent: () => import('./features/cancellations/cancel-show.page').then((m) => m.CancelShowPage) },
+      { path: 'cancellations', pathMatch: 'full', redirectTo: '/shows?tab=cancelled' },
+      { path: 'cancellations/:showId', redirectTo: ({ params }) => '/shows/' + params['showId'] + '/cancel' },
+      { path: 'refunds', title: 'Refunds', loadComponent: () => import('./features/refunds/refunds.page').then((m) => m.RefundsPage) },
+      { path: 'refunds/:refundId', title: 'Refund', loadComponent: () => import('./features/refunds/refund-detail.page').then((m) => m.RefundDetailPage) },
+      { path: 'reports', title: 'Reports', loadComponent: () => import('./features/reports/reports.page').then((m) => m.ReportsPage) },
+      { path: 'settings', title: 'Settings', loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage) },
+      { path: '', pathMatch: 'full', redirectTo: 'overview' },
     ],
   },
   { path: '**', redirectTo: '' },
