@@ -106,14 +106,6 @@ interface NavItem { label: string; icon: string; link: string; /** Starts a new 
             @if (openMenu() === 'user') {
               <div class="pop user-pop">
                 <div class="pop-head"><span class="grow"><strong>{{ store.currentUser().name }}</strong><small>{{ store.currentUser().email }}</small></span></div>
-                <div class="pop-sub">Switch user (prototype)</div>
-                @for (u of store.staffUsers(); track u.id) {
-                  <button type="button" class="pop-item" [attr.aria-selected]="store.currentUser().name === u.name" (click)="switchUser(u.id)">
-                    <span class="avatar sm">{{ u.initials }}</span>
-                    <span class="grow"><strong>{{ u.name }}</strong><small>{{ u.role }}@if (u.counter) { · {{ u.counter }} }</small></span>
-                    @if (store.currentUser().name === u.name) { <app-icon name="check" /> }
-                  </button>
-                }
                 <div class="pop-note">Signed in as {{ store.currentUser().role }}. Last sign-in {{ lastSignIn }}.</div>
                 <button type="button" class="pop-item signout" (click)="signOut()"><app-icon name="lock" /><span class="grow"><strong>Sign out</strong></span></button>
               </div>
@@ -313,11 +305,6 @@ export class ShellComponent {
     this.openMenu.update((m) => (m === menu ? null : menu));
   }
 
-  switchUser(id: string): void {
-    this.store.signInAs(id);
-    this.auth.setUser(id);
-    this.openMenu.set(null);
-  }
 
   signOut(): void {
     this.openMenu.set(null);
