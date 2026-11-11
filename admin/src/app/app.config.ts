@@ -1,15 +1,24 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { ApplicationConfig, Injectable, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { RouterStateSnapshot, TitleStrategy, provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 import { routes } from './app.routes';
-import { AdminApi } from './core/admin-api';
-import { MockAdminApi } from './core/mock-admin-api';
+
+/** "Shows · ThiraiHub Operations" in the browser tab. */
+@Injectable({ providedIn: 'root' })
+class AppTitleStrategy extends TitleStrategy {
+  constructor(private readonly title: Title) { super(); }
+  override updateTitle(snapshot: RouterStateSnapshot): void {
+    const page = this.buildTitle(snapshot);
+    this.title.setTitle(page ? `${page} · ThiraiHub Operations` : 'ThiraiHub Operations');
+  }
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withComponentInputBinding()),
-    // The prototype keeps data in memory. The real app provides an HTTP implementation of AdminApi instead.
-    { provide: AdminApi, useClass: MockAdminApi },
+    provideZonelessChangeDetection(),
+    provideRouter(routes, withComponentInputBinding(), withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+    { provide: TitleStrategy, useClass: AppTitleStrategy },
   ],
 };
