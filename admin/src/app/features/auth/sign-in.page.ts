@@ -28,7 +28,7 @@ const RESEND_SECONDS = 30;
         </div>
         <div class="veil"></div>
         <div class="grain"></div>
-        <div class="stage-top"><span class="tmark"><svg viewBox="0 9 64 54" aria-hidden="true" focusable="false"><path d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" /><circle cx="15" cy="45" r="5.5" fill="#E5484D" /><circle cx="32" cy="45" r="5.5" fill="#E5484D" /><circle cx="49" cy="45" r="5.5" fill="#E5484D" /><circle cx="23.5" cy="57" r="5" fill="#E5484D" /><circle cx="40.5" cy="57" r="5" fill="#E5484D" /></svg></span><span class="by">thiraihub operations</span></div>
+        <div class="stage-top"><span class="tmark"><svg viewBox="0 9 64 54" aria-hidden="true" focusable="false"><path d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" /><circle cx="15" cy="45" r="5.5" fill="#E5484D" /><circle cx="32" cy="45" r="5.5" fill="#E5484D" /><circle cx="49" cy="45" r="5.5" fill="#E5484D" /><circle cx="23.5" cy="57" r="5" fill="#E5484D" /><circle cx="40.5" cy="57" r="5" fill="#E5484D" /></svg></span><span class="by">thiraihub</span></div>
         <div class="title">
           @if (cover(); as c) { <img [src]="c" alt="" /> } @else { <strong>{{ theatreName() }}</strong> }
           <span class="rule"></span>
@@ -125,8 +125,8 @@ const RESEND_SECONDS = 30;
         linear-gradient(180deg, rgba(8, 10, 15, 0.82) 0%, rgba(8, 10, 15, 0.28) 35%, rgba(8, 10, 15, 0.28) 65%, rgba(8, 10, 15, 0.88) 100%); }
     .grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
     .stage-top { position: relative; display: flex; align-items: center; gap: 12px; }
-    .tmark svg { display: block; width: 40px; height: auto; }
-    .by { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.62); }
+    .tmark svg { display: block; width: 36px; height: auto; }
+    .by { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.03em; color: #e5484d; }
     .title { position: relative; display: flex; flex-direction: column; align-items: center; gap: 24px; margin: auto; width: min(600px, 100%); text-align: center; }
     /* The wordmark is black on white; inverted and screened it becomes light lettering on the stage. */
     .title > img { display: block; width: 100%; height: auto; filter: invert(1) contrast(1.05); mix-blend-mode: screen; }
