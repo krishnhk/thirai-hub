@@ -83,7 +83,8 @@ export function buildTicket(store: AdminStore, b: Booking, onlySeat?: string): T
   return {
     ref: b.ref,
     logoUrl: theatre?.logoUrl ?? '',
-    titleUrl: theatre?.titleUrl ?? '',
+    // The wordmark alone (no emblem), when the cover is the branded wordmark.
+    titleUrl: (theatre?.coverBranded ? theatre.coverUrl : '') || theatre?.titleUrl || '',
     theatre: theatre?.name ?? '',
     area: theatre ? `${theatre.area}, ${theatre.city}` : '',
     film: movie?.title ?? 'Film',

@@ -52,7 +52,6 @@ export class QrComponent {
             @if (t.titleUrl) {
               <img class="title-img" [src]="t.titleUrl" [alt]="t.theatre" />
             } @else {
-              @if (t.logoUrl) { <img class="logo" [src]="t.logoUrl" alt="" /> }
               <strong class="tname">{{ t.theatre }}</strong>
             }
             <span class="area">{{ t.area }}</span>
@@ -121,8 +120,7 @@ export class QrComponent {
     .k { display: block; font-size: 6.4pt; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #555; }
 
     .hd { display: flex; flex-direction: column; align-items: center; gap: 0.6mm; text-align: center; }
-    .logo { width: 10mm; height: 10mm; object-fit: contain; filter: grayscale(1) contrast(1.8); }
-    .title-img { display: block; width: 40mm; max-width: 100%; height: auto; margin: 0 0 0.6mm; filter: grayscale(1) contrast(1.8); }
+    .title-img { display: block; width: 44mm; max-width: 100%; height: auto; margin: 0 0 0.8mm; filter: grayscale(1) contrast(1.8); }
     .hd strong { font-size: 9.5pt; letter-spacing: 0.2em; text-transform: uppercase; }
     .area { font-size: 6.8pt; letter-spacing: 0.14em; text-transform: uppercase; color: #444; }
     .reprint { position: absolute; top: 6mm; right: 7mm; padding: 0.3mm 1.6mm; border: 0.25mm solid #000; font-size: 6pt; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
