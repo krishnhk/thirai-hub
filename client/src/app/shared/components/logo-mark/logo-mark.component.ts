@@ -1,17 +1,19 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-/** ThiraiHub "Ticket Play" mark: a ticket stub with a play cue. */
+/** ThiraiHub mark: a wide curved screen over rows of seats, in cinema red. */
 @Component({
   selector: 'app-logo-mark',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg viewBox="4 12 56 40" [style.width.px]="width()" aria-hidden="true" focusable="false">
-      <path
-        d="M10 16h44a3 3 0 0 1 3 3v8a5 5 0 0 0 0 10v8a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3v-8a5 5 0 0 0 0-10v-8a3 3 0 0 1 3-3z"
-        fill="var(--brand)"
-      />
-      <path d="M20 25l12 7-12 7z" fill="var(--on-primary)" />
-      <path d="M44 20v24" stroke="var(--on-primary)" stroke-width="2.4" stroke-dasharray="3.5 3.5" />
+    <svg viewBox="0 9 64 54" [style.width.px]="width()" aria-hidden="true" focusable="false">
+      <path d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" />
+      <g fill="#E5484D">
+        <circle cx="15" cy="45" r="5.5" />
+        <circle cx="32" cy="45" r="5.5" />
+        <circle cx="49" cy="45" r="5.5" />
+        <circle cx="23.5" cy="57" r="5" />
+        <circle cx="40.5" cy="57" r="5" />
+      </g>
     </svg>
   `,
   styles: `

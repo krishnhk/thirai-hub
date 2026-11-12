@@ -5,7 +5,7 @@ const SEEN_KEY = 'thiraihub.admin.splash.seen';
 const HOLD_MS = 3000;
 const FADE_MS = 400;
 
-/** Opening screen, shared with the customer app: the Ticket Play outline draws itself, fills, then the name appears. Plays once per session. */
+/** Opening screen, shared with the customer app: the screen curve draws itself, the seats pop in, then the name appears. Plays once per session. */
 @Component({
   selector: 'app-splash',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,27 +29,17 @@ const FADE_MS = 400;
         <div class="lock">
           <div class="stack">
           <div class="brand">
-          <svg viewBox="4 12 56 40" aria-hidden="true" focusable="false">
-            <g class="tl">
-              <path d="M10 16h34v32H10a3 3 0 0 1-3-3v-8a5 5 0 0 0 0-10v-8a3 3 0 0 1 3-3z" fill="var(--brand)" />
-            </g>
-            <g class="tr">
-              <path d="M44 16h10a3 3 0 0 1 3 3v8a5 5 0 0 0 0 10v8a3 3 0 0 1-3 3H44z" fill="var(--brand)" />
-            </g>
-            <path class="perf" d="M44 20v24" stroke="var(--bg)" stroke-width="2.4" stroke-dasharray="3.5 3.5" />
-            <path class="play" d="M20 25l12 7-12 7z" fill="var(--on-primary)" />
-            <path
-              class="outline"
-              pathLength="1"
-              d="M10 16h44a3 3 0 0 1 3 3v8a5 5 0 0 0 0 10v8a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3v-8a5 5 0 0 0 0-10v-8a3 3 0 0 1 3-3z"
-              fill="none"
-              stroke="var(--accent)"
-              stroke-width="1.6"
-            />
+          <svg viewBox="0 9 64 54" aria-hidden="true" focusable="false">
+            <path class="arc" pathLength="1" d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" />
+            <circle class="seat" style="--i: 0" cx="15" cy="45" r="5.5" fill="#E5484D" />
+            <circle class="seat" style="--i: 1" cx="32" cy="45" r="5.5" fill="#E5484D" />
+            <circle class="seat" style="--i: 2" cx="49" cy="45" r="5.5" fill="#E5484D" />
+            <circle class="seat" style="--i: 3" cx="23.5" cy="57" r="5" fill="#E5484D" />
+            <circle class="seat" style="--i: 4" cx="40.5" cy="57" r="5" fill="#E5484D" />
           </svg>
           <span class="wm" aria-hidden="true">
             @for (letter of letters; track $index) {
-              <i [class.hub]="$index >= 6" [style.--i]="$index">{{ letter }}</i>
+              <i [style.--i]="$index">{{ letter }}</i>
             }
           </span>
           </div>
@@ -95,27 +85,18 @@ const FADE_MS = 400;
     .stack { display: grid; place-items: center; }
     .brand { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; gap: 22px; }
     .load { position: relative; display: block; width: clamp(120px, 14vw, 180px); height: 2px; margin-top: 8px; overflow: hidden; border-radius: 2px; background: rgba(255, 255, 255, 0.14); }
-    .load i { position: absolute; inset: 0; width: 100%; transform-origin: left; background: var(--accent); animation: fill 2.8s cubic-bezier(0.3, 0.1, 0.2, 1) both; }
+    .load i { position: absolute; inset: 0; width: 100%; transform-origin: left; background: #e5484d; animation: fill 2.8s cubic-bezier(0.3, 0.1, 0.2, 1) both; }
     @keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
     .lock { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; }
-    svg { width: clamp(110px, 22vw, 190px); height: auto; overflow: visible; display: block; }
+    svg { width: clamp(84px, 13vw, 120px); height: auto; overflow: visible; display: block; }
 
-    .wm { font-weight: 800; font-size: clamp(32px, 6vw, 56px); letter-spacing: -0.03em; line-height: 1; color: var(--text); white-space: nowrap; }
+    .wm { font-weight: 800; font-size: clamp(32px, 6vw, 56px); letter-spacing: -0.03em; line-height: 1; color: #E5484D; white-space: nowrap; }
     .wm i { font-style: normal; display: inline-block; animation: fade-up 400ms calc(1.7s + var(--i) * 60ms) both; }
-    .wm i.hub { color: var(--accent); }
 
-    .tl, .tr, .play { transform-box: fill-box; transform-origin: center; }
-    .tl, .tr { animation: fade-in 500ms 1.2s both; }
-    .perf { animation: fade-in 300ms 1.55s both; }
-    .play { animation: pop 400ms 1.55s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
-    .outline { stroke-dasharray: 1; opacity: 0; animation: draw 1.6s ease-in-out both; }
-
-    @keyframes draw {
-      0% { opacity: 1; stroke-dashoffset: 1; }
-      72% { opacity: 1; stroke-dashoffset: 0; }
-      100% { opacity: 0; stroke-dashoffset: 0; }
-    }
+    .arc { stroke-dasharray: 1; animation: draw-arc 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both; }
+    .seat { transform-box: fill-box; transform-origin: center; animation: pop 400ms calc(1.2s + var(--i) * 90ms) cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+    @keyframes draw-arc { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
     @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
     @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
@@ -126,7 +107,7 @@ const FADE_MS = 400;
   `,
 })
 export class SplashComponent implements OnDestroy {
-  readonly letters = 'ThiraiHub'.split('');
+  readonly letters = 'thiraihub'.split('');
   /** Posters for the wall, shuffled into six columns. */
   readonly columns = (() => {
     const names = ['dorothy', 'jailer-2', 'baththa', 'scene', 'modha-rathiri', 'dc', 'jana-nayagan', 'coolie', 'dragon', 'retro', 'thug-life', 'karuppu', 'madharaasi', 'good-bad-ugly', 'couple-friendly', 'with-love', '29', 'thaai-kizhavi'];

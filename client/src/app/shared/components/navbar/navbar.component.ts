@@ -165,7 +165,7 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
 
     .city-btn:hover { background: var(--surface-2); }
 
-    .brand-text { font-weight: 800; font-size: 1.08rem; letter-spacing: -0.02em; }
+    .brand-text { color: #E5484D; text-transform: lowercase; font-weight: 800; font-size: 1.08rem; letter-spacing: -0.02em; }
 
     .links { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
 

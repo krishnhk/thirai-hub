@@ -87,7 +87,7 @@ interface FooterLink {
     }
 
     .brand:hover { text-decoration: none; }
-    .brand-text { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .brand-text { color: #E5484D; text-transform: lowercase; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
 
     .tagline { margin: 0; color: var(--text-soft); font-size: 0.9rem; line-height: 1.55; }
 
