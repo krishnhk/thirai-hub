@@ -4,13 +4,13 @@ import { Title } from '@angular/platform-browser';
 
 import { routes } from './app.routes';
 
-/** "Shows · ThiraiHub Operations" in the browser tab. */
+/** "Shows · ThiraiDesk" in the browser tab. */
 @Injectable({ providedIn: 'root' })
 class AppTitleStrategy extends TitleStrategy {
   constructor(private readonly title: Title) { super(); }
   override updateTitle(snapshot: RouterStateSnapshot): void {
     const page = this.buildTitle(snapshot);
-    this.title.setTitle(page ? `${page} · ThiraiHub Operations` : 'ThiraiHub Operations');
+    this.title.setTitle(page ? `${page} · ThiraiDesk` : 'ThiraiDesk');
   }
 }
 

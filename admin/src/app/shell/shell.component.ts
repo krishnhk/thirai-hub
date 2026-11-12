@@ -28,10 +28,10 @@ interface NavItem { label: string; icon: string; link: string; /** Starts a new 
           <button class="theatre-btn" type="button" [class.single]="!multiTheatre() && !collapsed()" [attr.aria-expanded]="multiTheatre() ? openMenu() === 'theatre' : null" [attr.aria-haspopup]="multiTheatre() ? 'listbox' : null" [attr.title]="collapsed() ? 'Expand sidebar' : null" (click)="collapsed() ? collapsed.set(false) : multiTheatre() && toggle('theatre')">
             @if (selectedTheatre(); as t) {
               <span class="t-logo" [class.mono]="!t.logoUrl">@if (t.logoUrl) { <img [src]="t.logoUrl" alt="" /> } @else { {{ initialsOf(t.name) }} }</span>
-              <span class="t-text"><strong>{{ t.name }}</strong><small>ThiraiHub</small></span>
+              <span class="t-text"><strong>{{ t.name }}</strong><small>ThiraiDesk</small></span>
             } @else {
               <span class="t-logo all"><app-icon name="theatre" /></span>
-              <span class="t-text"><strong>All theatres</strong><small>ThiraiHub</small></span>
+              <span class="t-text"><strong>All theatres</strong><small>ThiraiDesk</small></span>
             }
             @if (multiTheatre()) { <app-icon name="chevronDown" /> }
           </button>

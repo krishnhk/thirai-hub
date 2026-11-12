@@ -1,5 +1,5 @@
 /*
- * ThiraiHub Theatre Operations Console: the design system.
+ * ThiraiDesk: the design system.
  * A dark control-room palette: near-black surfaces, a single amber accent for actions and focus,
  * semantic colours for status only, quiet borders, tabular numbers. Components style themselves
  * from these tokens and the shared classes below; feature styles stay in their components.

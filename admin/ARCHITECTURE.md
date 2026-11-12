@@ -1,4 +1,4 @@
-# ThiraiHub Operations Console: architecture
+# ThiraiDesk: architecture
 
 A front-end prototype of the theatre operations console. Data is mock data held in front-end state; there are no API calls. The shapes and rules mirror what the real backend will provide.
 
