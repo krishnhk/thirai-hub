@@ -41,7 +41,7 @@ const MAX_CELL = 40;
     @if (screen(); as s) {
       <div class="page">
         <app-page-header [title]="s.name + ' seat layout'" [subtitle]="origin()"
-          [crumbs]="[{ label: 'Theatre', link: '/theatres/' + s.theatreId }, { label: 'Screens', link: '/theatres/' + s.theatreId + '?tab=screens' }, { label: s.name, link: '/screens/' + s.id }, { label: 'Seat layout' }]">
+          [crumbs]="[{ label: 'Theatre', link: '/theatre' }, { label: 'Screens', link: '/theatre?tab=screens' }, { label: s.name, link: '/screens/' + s.id }, { label: 'Seat layout' }]">
           @if (editor.dirty()) { <span class="unsaved" role="status">Unsaved changes</span> }
           @if (!s.layout) { <span class="badge warning" title="Shows can only be scheduled on a screen with a published layout">Not published</span> }
           <a class="btn ghost" [routerLink]="['/screens', s.id]">Screen details</a>

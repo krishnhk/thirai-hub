@@ -324,7 +324,7 @@ export class AdminStore {
   addTheatre(input: Omit<Theatre, 'id' | 'updatedAt' | 'status'>): Theatre {
     const theatre: Theatre = { ...input, id: `t-${input.code.toLowerCase()}`, status: 'active', updatedAt: new Date() };
     this.theatres.update((list) => [...list, theatre]);
-    this.log({ action: 'theatre.created', theatreId: theatre.id, target: theatre.name, summary: `Added ${theatre.name}, ${theatre.area}.`, link: `/theatres/${theatre.id}` });
+    this.log({ action: 'theatre.created', theatreId: theatre.id, target: theatre.name, summary: `Added ${theatre.name}, ${theatre.area}.`, link: '/theatre' });
     return theatre;
   }
 
@@ -338,14 +338,14 @@ export class AdminStore {
         ? { field: 'Cover photo', from: before.coverUrl ? 'Photo' : 'None', to: p.coverUrl ? 'New photo' : 'None' }
         : { field: label(String(k)), from: String(before[k] ?? ''), to: String(p[k] ?? '') }));
     this.theatres.update((list) => list.map((t) => (t.id === id ? { ...t, ...patch, updatedAt: new Date() } : t)));
-    this.log({ action: 'theatre.updated', theatreId: id, target: before.name, summary: `Updated theatre details${changes.length ? ` (${changes.map((c) => c.field).join(', ')})` : ''}.`, changes, link: `/theatres/${id}` });
+    this.log({ action: 'theatre.updated', theatreId: id, target: before.name, summary: `Updated theatre details${changes.length ? ` (${changes.map((c) => c.field).join(', ')})` : ''}.`, changes, link: '/theatre' });
   }
 
   setTheatreStatus(id: string, status: ActiveStatus): void {
     const t = this.theatre(id);
     if (!t || t.status === status) return;
     this.theatres.update((list) => list.map((x) => (x.id === id ? { ...x, status, updatedAt: new Date() } : x)));
-    this.log({ action: status === 'active' ? 'theatre.activated' : 'theatre.deactivated', theatreId: id, target: t.name, summary: status === 'active' ? 'Activated the theatre.' : 'Deactivated the theatre.', changes: [{ field: 'Status', from: t.status, to: status }], link: `/theatres/${id}` });
+    this.log({ action: status === 'active' ? 'theatre.activated' : 'theatre.deactivated', theatreId: id, target: t.name, summary: status === 'active' ? 'Activated the theatre.' : 'Deactivated the theatre.', changes: [{ field: 'Status', from: t.status, to: status }], link: '/theatre' });
   }
 
   // ------------------------------------------------------------------ Screens
@@ -431,22 +431,6 @@ export class AdminStore {
       link: `/seats/${screenId}`,
     });
     return [];
-  }
-
-  // ------------------------------------------------------------------ Movies
-
-  addMovie(input: Omit<Movie, 'id'>): Movie {
-    const movie: Movie = { ...input, id: `m-${input.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now().toString(36)}` };
-    this.movies.update((list) => [movie, ...list]);
-    this.log({ action: 'movie.created', theatreId: null, target: movie.title, summary: `Added ${movie.title} to the catalogue.`, link: `/movies/${movie.id}` });
-    return movie;
-  }
-
-  updateMovie(id: string, patch: Partial<Omit<Movie, 'id'>>): void {
-    const m = this.movie(id);
-    if (!m) return;
-    this.movies.update((list) => list.map((x) => (x.id === id ? { ...x, ...patch } : x)));
-    this.log({ action: 'movie.updated', theatreId: null, target: m.title, summary: 'Updated the film details.', link: `/movies/${id}` });
   }
 
   // ------------------------------------------------------------------ Shows

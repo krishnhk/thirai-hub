@@ -270,7 +270,7 @@ export class ShellComponent {
     const single = this.store.theatres().length === 1;
     return this.nav
       .filter((i) => !(single && i.link === '/screens'))
-      .map((i) => (single && i.link === '/theatres' ? { ...i, label: 'Theatre' } : i));
+      .map((i) => (single && i.link === '/theatre' ? { ...i, label: 'Theatre' } : i));
   });
   /** In the order the day goes: run the box office and the shows, handle cancellations and refunds; then the catalogue and reports; then setup. */
   readonly nav: NavItem[] = [
@@ -278,9 +278,8 @@ export class ShellComponent {
     { label: 'Counter Booking', icon: 'ticket', link: '/counter' },
     { label: 'Shows', icon: 'shows', link: '/shows' },
     { label: 'Refunds', icon: 'refund', link: '/refunds' },
-    { label: 'Movies', icon: 'movie', link: '/movies', gap: true },
-    { label: 'Reports', icon: 'reports', link: '/reports' },
-    { label: 'Theatres', icon: 'theatre', link: '/theatres', gap: true },
+    { label: 'Reports', icon: 'reports', link: '/reports', gap: true },
+    { label: 'Theatres', icon: 'theatre', link: '/theatre', gap: true },
     { label: 'Screens', icon: 'screen', link: '/screens' },
     { label: 'Settings', icon: 'settings', link: '/settings' },
   ];

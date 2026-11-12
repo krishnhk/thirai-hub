@@ -69,7 +69,7 @@ const emptyAgg = (): Agg => ({ shows: 0, seats: 0, capacity: 0, gross: 0, cancel
                 <tbody>
                   @for (t of breakdown(); track t.id) {
                     <tr class="group">
-                      <td><a class="plain" [routerLink]="['/theatres', t.id]"><strong>{{ t.name }}</strong></a></td>
+                      <td><a class="plain" routerLink="/theatre"><strong>{{ t.name }}</strong></a></td>
                       <td class="num strong">{{ t.agg.shows }}</td><td class="num strong">{{ formatNumber(t.agg.seats) }}</td>
                       <td class="num strong">{{ formatMoney(t.agg.gross) }}</td>
                       <td><app-meter [value]="ratio(t.agg)" /></td><td class="num strong">{{ t.agg.cancelled || '—' }}</td>

@@ -405,12 +405,11 @@ export function buildMockData(today = new Date()) {
   const sName = (id: string) => { const s = screens.find((x) => x.id === id)!; return `${s.name} · ${tName(s.theatreId)}`; };
   const mTitle = (id: string) => movies.find((x) => x.id === id)!.title;
 
-  log(ago(9, 12), USERS.owner, 'theatre.updated', 't-hayat-porur', 'Hayat Cinemas', 'Added the box office supervisor to the theatre staff.', { changes: [{ field: 'Staff', from: '3 people', to: '4 people' }], link: '/theatres/t-hayat-porur' });
+  log(ago(9, 12), USERS.owner, 'theatre.updated', 't-hayat-porur', 'Hayat Cinemas', 'Added the box office supervisor to the theatre staff.', { changes: [{ field: 'Staff', from: '3 people', to: '4 people' }], link: '/theatre' });
   log(ago(5, 15), USERS.gm, 'layout.published', 't-hayat-porur', sName('s-hayat-porur-2'), 'Published layout version 2: the back row became couple seats.', { changes: [{ field: 'Row J', from: '16 Premium seats', to: '6 Couple Seat pairs' }, { field: 'Bookable seats', from: '146', to: '140' }], link: '/seats/s-hayat-porur-2' });
   log(ago(4, 10), USERS.ops, 'screen.created', 't-hayat-porur', sName('s-hayat-porur-3'), 'Created Screen 3 (2D).', { link: '/screens/s-hayat-porur-3' });
   log(ago(1, 18), USERS.ops, 'layout.saved', 't-hayat-porur', sName('s-hayat-porur-3'), 'Saved a draft layout with 2 Premium and 5 Recliner rows.', { link: '/seats/s-hayat-porur-3' });
-  log(ago(3, 16), USERS.gm, 'theatre.updated', 't-hayat-porur', 'Hayat Cinemas', 'Updated the operations phone number.', { changes: [{ field: 'Phone', from: '+91 44 2476 1111', to: '+91 44 2476 0000' }], link: '/theatres/t-hayat-porur' });
-  log(ago(2, 11), USERS.gm, 'movie.created', null, 'Scene', 'Added Scene to the catalogue with 2D and Dolby Atmos.', { link: '/movies/m-scene' });
+  log(ago(3, 16), USERS.gm, 'theatre.updated', 't-hayat-porur', 'Hayat Cinemas', 'Updated the operations phone number.', { changes: [{ field: 'Phone', from: '+91 44 2476 1111', to: '+91 44 2476 0000' }], link: '/theatre' });
   // Publication of the current week's schedule.
   theatres.filter((t) => t.status === 'active').forEach((t, i) => {
     const count = shows.filter((s) => s.theatreId === t.id && s.publishedAt && s.start >= day0 && s.start < addDays(day0, 4)).length;

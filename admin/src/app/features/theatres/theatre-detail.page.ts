@@ -19,7 +19,7 @@ import { TheatreStatusActions } from './theatre-status';
       <div class="page">
         @if (store.theatres().length > 1) {
         <nav class="crumbs" aria-label="Breadcrumb">
-          <a routerLink="/theatres">Theatres</a><app-icon name="chevronRight" /><span aria-current="page">{{ t.name }}</span>
+          <a routerLink="/theatre">Theatres</a><app-icon name="chevronRight" /><span aria-current="page">{{ t.name }}</span>
         </nav>
         }
 
@@ -116,10 +116,10 @@ import { TheatreStatusActions } from './theatre-status';
 
     } @else {
       <div class="page">
-        <app-page-header title="Theatre not found" [crumbs]="[{ label: 'Theatres', link: '/theatres' }, { label: 'Not found' }]" />
+        <app-page-header title="Theatre not found" [crumbs]="[{ label: 'Theatres', link: '/theatre' }, { label: 'Not found' }]" />
         <section class="card">
           <app-empty-state icon="theatre" title="This theatre does not exist" text="It may have been removed, or the link is wrong.">
-            <a class="btn" routerLink="/theatres">Back to theatres</a>
+            <a class="btn" routerLink="/theatre">Back to theatres</a>
           </app-empty-state>
         </section>
       </div>
@@ -208,7 +208,7 @@ export class TheatreDetailPage {
   protected readonly router = inject(Router);
   protected readonly statusActions = inject(TheatreStatusActions);
 
-  readonly theatreId = input.required<string>();
+  readonly theatreId = computed(() => this.store.theatres()[0]?.id ?? '');
 
   protected readonly formatDateTime = formatDateTime;
   protected readonly formatDate = formatDate;

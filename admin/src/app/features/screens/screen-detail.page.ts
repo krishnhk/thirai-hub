@@ -23,7 +23,7 @@ import { scheduleBlockers, toggleScreenStatus } from './screen-info';
     @if (screen(); as s) {
       <div class="page">
         <app-page-header [title]="s.name" [subtitle]="subtitleLine()"
-          [crumbs]="[{ label: 'Theatre', link: '/theatres/' + s.theatreId }, { label: 'Screens', link: '/theatres/' + s.theatreId + '?tab=screens' }, { label: s.name }]">
+          [crumbs]="[{ label: 'Theatre', link: '/theatre' }, { label: 'Screens', link: '/theatre?tab=screens' }, { label: s.name }]">
           @if (store.isSchedulable(s)) { <span class="badge success state">Ready to schedule</span> }
           @else if (s.status !== 'active') { <span class="badge neutral state">Inactive</span> }
           @else { <span class="badge warning state">Needs a layout</span> }
@@ -101,7 +101,7 @@ import { scheduleBlockers, toggleScreenStatus } from './screen-info';
               <div class="card-head"><h2>Details</h2></div>
               <div class="card-body">
                 <dl class="facts">
-                  <dt>Theatre</dt><dd><a [routerLink]="['/theatres', s.theatreId]">{{ theatreName() }}</a></dd>
+                  <dt>Theatre</dt><dd><a routerLink="/theatre">{{ theatreName() }}</a></dd>
                   <dt>Screen number</dt><dd>{{ s.number }}</dd>
                   <dt>Type</dt><dd>{{ s.type }}</dd>
                   <dt>Sound</dt><dd>{{ s.sound || '—' }}</dd>

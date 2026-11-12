@@ -93,9 +93,9 @@ import { ShowActions, editMode, errorsOf, warningsOf } from './show-utils';
             <div class="card-body info">
               <img class="poster" [src]="movie()?.posterUrl ?? ''" [alt]="(movie()?.title ?? 'Film') + ' poster'" />
               <dl class="facts">
-                <dt>Film</dt><dd>@if (movie(); as m) { <a [routerLink]="['/movies', m.id]">{{ m.title }}</a> <span class="tag">{{ m.certification }}</span> }</dd>
+                <dt>Film</dt><dd>@if (movie(); as m) { {{ m.title }} <span class="tag">{{ m.certification }}</span> }</dd>
                 <dt>Format</dt><dd>{{ s.format }} · {{ s.language }}</dd>
-                <dt>Theatre</dt><dd><a [routerLink]="['/theatres', s.theatreId]">{{ theatre()?.name }}</a></dd>
+                <dt>Theatre</dt><dd><a routerLink="/theatre">{{ theatre()?.name }}</a></dd>
                 <dt>Screen</dt><dd><a [routerLink]="['/screens', s.screenId]">{{ screen()?.name }}</a> <span class="muted small">{{ screen()?.type }}</span></dd>
                 <dt>Date</dt><dd>{{ day(s.start) }}</dd>
                 <dt>Time</dt><dd>{{ time(s.start) }} – {{ time(end()) }} <span class="muted small">({{ duration(movie()?.runtime ?? 0) }} film, {{ s.intermission ? s.intermission + ' min interval' : 'no interval' }})</span></dd>

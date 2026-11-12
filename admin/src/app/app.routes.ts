@@ -11,8 +11,7 @@ const leaveGuard: CanDeactivateFn<{ canLeave?: () => boolean | Promise<boolean> 
 
 /** One theatre: its page is where theatre and screen management live. */
 const theatrePage = (tab?: string) => () => {
-  const first = inject(AdminStore).theatres()[0];
-  return first ? inject(Router).createUrlTree(['/theatres', first.id], tab ? { queryParams: { tab } } : {}) : '/overview';
+  return inject(Router).createUrlTree(['/theatre'], tab ? { queryParams: { tab } } : {});
 };
 
 /** Every section loads on demand, so the first screen stays fast. */
@@ -24,13 +23,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'overview', title: 'Overview', loadComponent: () => import('./features/overview/overview.page').then((m) => m.OverviewPage) },
-      { path: 'theatres', pathMatch: 'full', redirectTo: theatrePage() },
-      { path: 'theatres/:theatreId', title: 'Theatre', loadComponent: () => import('./features/theatres/theatre-detail.page').then((m) => m.TheatreDetailPage) },
+      { path: 'theatre', title: 'Theatre', loadComponent: () => import('./features/theatres/theatre-detail.page').then((m) => m.TheatreDetailPage) },
+      { path: 'theatres', redirectTo: theatrePage() },
+      { path: 'theatres/:theatreId', redirectTo: theatrePage() },
       { path: 'screens', pathMatch: 'full', redirectTo: theatrePage('screens') },
       { path: 'screens/:screenId', title: 'Screen', loadComponent: () => import('./features/screens/screen-detail.page').then((m) => m.ScreenDetailPage) },
       { path: 'seats/:screenId', title: 'Seat designer', canDeactivate: [leaveGuard], loadComponent: () => import('./features/seats/seat-designer.page').then((m) => m.SeatDesignerPage) },
-      { path: 'movies', title: 'Movies', loadComponent: () => import('./features/movies/movies.page').then((m) => m.MoviesPage) },
-      { path: 'movies/:movieId', title: 'Movie', loadComponent: () => import('./features/movies/movie-detail.page').then((m) => m.MovieDetailPage) },
       { path: 'shows', title: 'Shows', loadComponent: () => import('./features/shows/shows.page').then((m) => m.ShowsPage) },
       { path: 'shows/new', title: 'Create show', loadComponent: () => import('./features/shows/show-editor.page').then((m) => m.ShowEditorPage) },
       { path: 'shows/:showId/edit', title: 'Edit show', loadComponent: () => import('./features/shows/show-editor.page').then((m) => m.ShowEditorPage) },
