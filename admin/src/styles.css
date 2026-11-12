@@ -18,11 +18,11 @@
   --text-muted: #8b93a1;
   --text-faint: #5f6774;
 
-  --accent: #e5a93d;
-  --accent-strong: #f2bb55;
-  --accent-soft: rgba(229, 169, 61, 0.14);
-  --accent-line: rgba(229, 169, 61, 0.45);
-  --on-accent: #1b1305;
+  --accent: #e5484d;
+  --accent-strong: #f06368;
+  --accent-soft: rgba(229, 72, 77, 0.16);
+  --accent-line: rgba(229, 72, 77, 0.5);
+  --on-accent: #ffffff;
 
   --success: #43c07f;
   --success-soft: rgba(67, 192, 127, 0.13);
@@ -84,10 +84,10 @@
   --text-muted: #5b6779;
   --text-faint: #8794a7;
 
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --accent-soft: rgba(37, 99, 235, 0.09);
-  --accent-line: rgba(37, 99, 235, 0.45);
+  --accent: #d93a40;
+  --accent-strong: #bf2f35;
+  --accent-soft: rgba(217, 58, 64, 0.09);
+  --accent-line: rgba(217, 58, 64, 0.45);
   --on-accent: #ffffff;
 
   --success: #15803d;
@@ -149,6 +149,10 @@ a:hover { color: var(--accent-strong); }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Numbers are typed, so the up and down arrows are hidden everywhere. */
+input[type='number'] { appearance: textfield; -moz-appearance: textfield; }
+input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-outer-spin-button { appearance: none; -webkit-appearance: none; margin: 0; }
 [hidden] { display: none !important; }
 ::selection { background: var(--accent-soft); }
 
