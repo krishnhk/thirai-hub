@@ -11,7 +11,7 @@ const FADE_MS = 400;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible()) {
-      <div class="splash" [class.leaving]="leaving()" role="status" aria-label="Loading ThiraiHub Operations" (click)="dismiss()">
+      <div class="splash" [class.leaving]="leaving()" role="status" aria-label="Loading ThiraiDesk" (click)="dismiss()">
         <div class="scene" aria-hidden="true">
           <div class="wall">
             @for (col of columns; track $index) {
@@ -24,18 +24,16 @@ const FADE_MS = 400;
             }
           </div>
           <div class="veil"></div>
-          <div class="edge top"><span>ThiraiHub</span><span>Operations Console</span><span>Now showing</span></div>
+          <div class="edge top"><span>ThiraiDesk</span><span>Operations Console</span><span>Now showing</span></div>
         </div>
         <div class="lock">
           <div class="stack">
           <div class="brand">
-          <svg viewBox="0 9 64 54" aria-hidden="true" focusable="false">
-            <path class="arc" pathLength="1" d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" />
-            <circle class="seat" style="--i: 0" cx="15" cy="45" r="5.5" fill="#E5484D" />
-            <circle class="seat" style="--i: 1" cx="32" cy="45" r="5.5" fill="#E5484D" />
-            <circle class="seat" style="--i: 2" cx="49" cy="45" r="5.5" fill="#E5484D" />
-            <circle class="seat" style="--i: 3" cx="23.5" cy="57" r="5" fill="#E5484D" />
-            <circle class="seat" style="--i: 4" cx="40.5" cy="57" r="5" fill="#E5484D" />
+          <svg viewBox="0 6 64 54" aria-hidden="true" focusable="false">
+            <path class="arc" pathLength="1" d="M5 22Q32 3 59 22" fill="none" stroke="#e5484d" stroke-width="9" stroke-linecap="round" />
+            <rect class="seat" style="--i: 0" x="6" y="34" width="52" height="9" rx="4.5" fill="#e5484d" />
+            <rect class="seat" style="--i: 1" x="12" y="43" width="7" height="14" rx="3.5" fill="#e5484d" />
+            <rect class="seat" style="--i: 2" x="45" y="43" width="7" height="14" rx="3.5" fill="#e5484d" />
           </svg>
           <span class="wm" aria-hidden="true">
             @for (letter of letters; track $index) {
@@ -107,7 +105,7 @@ const FADE_MS = 400;
   `,
 })
 export class SplashComponent implements OnDestroy {
-  readonly letters = 'thiraihub'.split('');
+  readonly letters = 'thiraidesk'.split('');
   /** Posters for the wall, shuffled into six columns. */
   readonly columns = (() => {
     const names = ['dorothy', 'jailer-2', 'baththa', 'scene', 'modha-rathiri', 'dc', 'jana-nayagan', 'coolie', 'dragon', 'retro', 'thug-life', 'karuppu', 'madharaasi', 'good-bad-ugly', 'couple-friendly', 'with-love', '29', 'thaai-kizhavi'];

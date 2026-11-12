@@ -28,13 +28,13 @@ const RESEND_SECONDS = 30;
         </div>
         <div class="veil"></div>
         <div class="grain"></div>
-        <div class="stage-top"><span class="tmark"><svg viewBox="0 9 64 54" aria-hidden="true" focusable="false"><path d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" /><circle cx="15" cy="45" r="5.5" fill="#E5484D" /><circle cx="32" cy="45" r="5.5" fill="#E5484D" /><circle cx="49" cy="45" r="5.5" fill="#E5484D" /><circle cx="23.5" cy="57" r="5" fill="#E5484D" /><circle cx="40.5" cy="57" r="5" fill="#E5484D" /></svg></span><span class="by">thiraihub</span></div>
+        <div class="stage-top"><span class="tmark"><svg viewBox="0 6 64 54" aria-hidden="true" focusable="false"><path d="M5 22Q32 3 59 22" fill="none" stroke="#e5484d" stroke-width="9" stroke-linecap="round" /><rect x="6" y="34" width="52" height="9" rx="4.5" fill="#e5484d" /><rect x="12" y="43" width="7" height="14" rx="3.5" fill="#e5484d" /><rect x="45" y="43" width="7" height="14" rx="3.5" fill="#e5484d" /></svg></span><span class="by">thiraidesk</span></div>
         <div class="title">
           @if (cover(); as c) { <img [src]="c" alt="" /> } @else { <strong>{{ theatreName() }}</strong> }
           <span class="rule"></span>
           <span class="tagline">Box office · Shows · Refunds</span>
         </div>
-        <div class="stage-foot">© ThiraiHub</div>
+        <div class="stage-foot">© ThiraiDesk</div>
       </aside>
 
       <main class="panel">
@@ -50,7 +50,7 @@ const RESEND_SECONDS = 30;
         <div class="form-wrap">
           <header class="id">
             <span class="logo">@if (logo(); as l) { <img [src]="l" alt="" /> }</span>
-            <div><strong>{{ theatreName() }}</strong><small>ThiraiHub Operations</small></div>
+            <div><strong>{{ theatreName() }}</strong><small>ThiraiDesk</small></div>
           </header>
 
           @if (step() === 'phone') {
@@ -247,7 +247,7 @@ export class SignInPage implements OnDestroy {
   readonly locked = signal(false);
   readonly resendIn = signal(0);
 
-  readonly theatreName = computed(() => this.store.theatres()[0]?.name ?? 'ThiraiHub');
+  readonly theatreName = computed(() => this.store.theatres()[0]?.name ?? 'ThiraiDesk');
   readonly logo = computed(() => this.store.theatres()[0]?.logoUrl ?? '');
   readonly cover = computed(() => this.store.theatres()[0]?.coverUrl ?? '');
   /** Posters for the wall, shuffled into four columns. */
