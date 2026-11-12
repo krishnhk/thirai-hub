@@ -50,11 +50,22 @@ export class AuthService {
   private phone = this.restored?.phone ?? '';
   /** Who passed step 1 and is waiting for the code. */
   private pending: StaffUser | null = null;
+  /** True when they signed in with an email, so the code goes to that email. */
+  private viaEmail = false;
   private passwordTries = 0;
   private codeTries = 0;
 
   /** The last four digits of the mobile the code goes to. */
   get maskedPhone(): string { return this.phone.slice(-4); }
+  /** Where the code was sent, partly hidden. */
+  get codeSentTo(): string {
+    const email = this.pending?.email;
+    if (this.viaEmail && email) {
+      const [name, domain] = email.split('@');
+      return `${name![0]}••••@${domain}`;
+    }
+    return `+91 ••••${this.maskedPhone}`;
+  }
   get passwordTriesLeft(): number { return Math.max(0, MAX_PASSWORD_TRIES - this.passwordTries); }
   get codeTriesLeft(): number { return Math.max(0, MAX_CODE_TRIES - this.codeTries); }
 
@@ -65,6 +76,7 @@ export class AuthService {
     const user = STAFF_USERS.find((u) => (id.includes('@') ? u.email.toLowerCase() === id : !!u.phone && digits(u.phone) === digits(id)));
     if (user && password === PROTOTYPE_PASSWORD) {
       this.pending = user;
+      this.viaEmail = id.includes('@');
       this.phone = digits(user.phone ?? '');
       this.passwordTries = 0;
       this.codeTries = 0;

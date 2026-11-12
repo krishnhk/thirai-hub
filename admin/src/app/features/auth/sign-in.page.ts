@@ -28,7 +28,7 @@ const RESEND_SECONDS = 30;
         </div>
         <div class="veil"></div>
         <div class="grain"></div>
-        <div class="stage-top"><span class="tmark"><svg viewBox="4 12 56 40" aria-hidden="true" focusable="false"><path d="M10 16h44a3 3 0 0 1 3 3v8a5 5 0 0 0 0 10v8a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3v-8a5 5 0 0 0 0-10v-8a3 3 0 0 1 3-3z" fill="var(--accent)" /><path d="M20 25l12 7-12 7z" fill="var(--on-accent)" /><path d="M44 20v24" stroke="var(--on-accent)" stroke-width="2.4" stroke-dasharray="3.5 3.5" fill="none" /></svg></span><span class="by">ThiraiHub Operations</span></div>
+        <div class="stage-top"><span class="tmark"><svg viewBox="0 9 64 54" aria-hidden="true" focusable="false"><path d="M5 25Q32 4 59 25" fill="none" stroke="#E5484D" stroke-width="9" stroke-linecap="round" /><circle cx="15" cy="45" r="5.5" fill="#E5484D" /><circle cx="32" cy="45" r="5.5" fill="#E5484D" /><circle cx="49" cy="45" r="5.5" fill="#E5484D" /><circle cx="23.5" cy="57" r="5" fill="#E5484D" /><circle cx="40.5" cy="57" r="5" fill="#E5484D" /></svg></span><span class="by">thiraihub operations</span></div>
         <div class="title">
           @if (cover(); as c) { <img [src]="c" alt="" /> } @else { <strong>{{ theatreName() }}</strong> }
           <span class="rule"></span>
@@ -75,7 +75,7 @@ const RESEND_SECONDS = 30;
           } @else {
             <form class="step" (submit)="$event.preventDefault(); verify()" novalidate>
               <h1>Enter the code</h1>
-              <p class="lead">Password accepted. We sent a 6-digit code to <strong>+91 ••••{{ auth.maskedPhone }}</strong>.</p>
+              <p class="lead">Password accepted. We sent a 6-digit code to <strong>{{ auth.codeSentTo }}</strong>.</p>
 
               <div class="otp" [class.bad]="!!error()">
                 @for (i of boxes; track i) {
@@ -164,7 +164,7 @@ const RESEND_SECONDS = 30;
     /* Floating label: the field is the whole control, the label rises when there is a value. */
     .float { position: relative; display: flex; align-items: center; height: 62px; border: 1px solid var(--border-strong); border-radius: 14px; background: var(--surface); transition: border-color 120ms ease, box-shadow 120ms ease; }
     .float:hover { border-color: var(--text-faint); }
-    .float:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .float:focus-within { border-color: var(--text-muted); box-shadow: 0 0 0 4px color-mix(in srgb, var(--text) 10%, transparent); }
     .float.bad { border-color: var(--danger); }
     .cc { display: flex; align-items: center; gap: 8px; align-self: stretch; padding: 0 14px 0 16px; border-right: 1px solid var(--border); font-family: var(--mono); font-size: 0.95rem; color: var(--text-soft); }
     .flag { width: 18px; height: 12px; border-radius: 2px; background: linear-gradient(180deg, #ff9933 0 33%, #fff 33% 66%, #138808 66%); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18); }
@@ -181,14 +181,14 @@ const RESEND_SECONDS = 30;
     .proto b { font-family: var(--mono); font-weight: 600; color: var(--text-muted); }
     .error-text { display: block; margin-top: 10px; }
     .float:focus-within label, .float.has label { top: 17px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-muted); }
-    .float:focus-within label { color: var(--accent); }
+    .float:focus-within label { color: var(--text); }
     .ok { width: 18px; height: 18px; margin-right: 16px; color: var(--success); }
 
     .otp { position: relative; display: flex; gap: 10px; }
     .otp input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; cursor: text; }
     .box { flex: 1; display: grid; place-items: center; height: 64px; border: 1px solid var(--border-strong); border-radius: 14px; background: var(--surface); font-family: var(--mono); font-size: 1.7rem; font-weight: 600; transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease; }
     .box.filled { border-color: var(--text-faint); transform: translateY(-1px); }
-    .box.on { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .box.on { border-color: var(--text-muted); box-shadow: 0 0 0 4px color-mix(in srgb, var(--text) 10%, transparent); }
     .otp.bad .box { border-color: var(--danger); animation: shake 300ms ease; }
     @keyframes shake { 25% { translate: -4px 0; } 75% { translate: 4px 0; } }
 
@@ -198,7 +198,7 @@ const RESEND_SECONDS = 30;
     .go:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.05); }
     .go:active:not(:disabled) { transform: none; }
     .go:disabled { background: var(--surface-3); color: var(--text-faint); box-shadow: none; cursor: not-allowed; }
-    .go:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .go:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
     .spin { width: 16px; height: 16px; border: 2px solid color-mix(in srgb, var(--text-faint) 50%, transparent); border-top-color: var(--text-soft); border-radius: 50%; animation: turn 700ms linear infinite; }
     @keyframes turn { to { rotate: 360deg; } }
     .links { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; }
@@ -209,7 +209,7 @@ const RESEND_SECONDS = 30;
     .note app-icon { flex: none; width: 15px; height: 15px; margin-top: 2px; color: var(--text-faint); }
 
     /* Light theme: meet in the middle. The right side is a soft grey-blue instead of glaring white; the left is a lighter, bluer stage. */
-    :host-context([data-theme='light']) .panel { background: radial-gradient(70% 45% at 50% 0%, rgba(37, 99, 235, 0.07), transparent 70%), #e4e9f2; }
+    :host-context([data-theme='light']) .panel { background: radial-gradient(70% 45% at 50% 0%, rgba(217, 58, 64, 0.07), transparent 70%), #e4e9f2; }
     :host-context([data-theme='light']) .float, :host-context([data-theme='light']) .box, :host-context([data-theme='light']) .round { background: #f7f9fc; border-color: #cdd5e3; }
     :host-context([data-theme='light']) .stage { background:
         radial-gradient(46% 38% at 50% 47%, rgba(255, 255, 255, 0.10), transparent 72%),
@@ -278,10 +278,6 @@ export class SignInPage implements OnDestroy {
     if (d !== el.value) el.value = d;
     this.code.set(d);
     this.error.set('');
-    if (d.length === 6 && !this.checking()) {
-      this.checking.set(true);
-      setTimeout(() => { this.checking.set(false); this.verify(); }, 350);
-    }
   }
 
   /** Step 1: email or mobile number and password. */
